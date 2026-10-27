@@ -6,6 +6,10 @@
 
 using namespace std;
 
+void getName(string& name, int number);
+int startScore(string name);
+void chooseWorkout(string workout, int number, int choice);
+
 //Initial Menu
 int main()
 {
@@ -23,32 +27,40 @@ int main()
 
     if (choice == 1)
     {
-        cout << "\nChoose Your Division\n";
-        cout << "1. Division III (Easy)\n";
-        cout << "2. Division II (Medium)\n";
-        cout << "3. Division I (Hard)\n";
-    
-        int division;
-    
-        cout << "\nEnter your division: ";
-        cin >> division;
+
+        //selecting difficulty
+        int difficulty = 0;
+        int division = chooseDivision();
     
         if (division == 1)
         {
             cout << "\nYou selected Division III.\n";
+            difficulty = 3;
         }
         else if (division == 2)
         {
             cout << "\nYou selected Division II.\n";
+            difficulty = 2;
         }
         else if (division == 3)
         {
             cout << "\nYou selected Division I.\n";
+            difficulty = 1;
         }
         else
         {
             cout << "\nInvalid division choice.\n";
         }
+
+        //Naming the runners 
+        
+        string runners[7];
+        
+        for(int i = 0; i<7; i++)
+        {
+            getName(runners[i], i + 1);
+        }
+        
     }
     else if (choice == 2)
     {
@@ -62,7 +74,22 @@ int main()
     return 0;
 } 
 
-void getName(string name, int number){
+int chooseDivision()
+{
+    int division;
+    
+    cout << "\nChoose Your Division\n";
+    cout << "1. Division III (Easy)\n";
+    cout << "2. Division II (Medium)\n";
+    cout << "3. Division I (Hard)\n";
+
+    cout << "\nEnter your division: ";
+    cin >> division;
+
+    return division;
+}
+
+void getName(string& name, int number){
     cout<<"Enter the name for runner "<<number<<": ";
     cin>>name;
 }
