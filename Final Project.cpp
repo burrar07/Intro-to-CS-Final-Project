@@ -22,8 +22,32 @@ int main()
 
     if (choice == 1)
     {
-        cout << "\nWelcome, Coach!\n";
-        cout << "Your season is about to begin.\n";
+        cout << "\nChoose Your Division\n";
+        cout << "1. Division III (Easy)\n";
+        cout << "2. Division II (Medium)\n";
+        cout << "3. Division I (Hard)\n";
+    
+        int division;
+    
+        cout << "\nEnter your division: ";
+        cin >> division;
+    
+        if (division == 1)
+        {
+            cout << "\nYou selected Division III.\n";
+        }
+        else if (division == 2)
+        {
+            cout << "\nYou selected Division II.\n";
+        }
+        else if (division == 3)
+        {
+            cout << "\nYou selected Division I.\n";
+        }
+        else
+        {
+            cout << "\nInvalid division choice.\n";
+        }
     }
     else if (choice == 2)
     {
