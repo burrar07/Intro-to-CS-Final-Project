@@ -5,6 +5,38 @@
 
 using namespace std;
 
+//Initial Menu
+int main()
+{
+    cout << "============================\n";
+    cout << "       XC MANAGEMENT\n";
+    cout << "============================\n";
+
+    cout << "\n1. Start New Season\n";
+    cout << "2. Quit Game\n";
+
+    int choice;
+
+    cout << "\nEnter your choice: ";
+    cin >> choice;
+
+    if (choice == 1)
+    {
+        cout << "\nWelcome, Coach!\n";
+        cout << "Your season is about to begin.\n";
+    }
+    else if (choice == 2)
+    {
+        cout << "\nThanks for playing!\n";
+    }
+    else
+    {
+        cout << "\nInvalid choice. Please restart the game.\n";
+    }
+
+    return 0;
+} 
+
 void getName(string name, int number){
     cout<<"Enter the name for runner "<<number<<": ";
     cin>>name;
