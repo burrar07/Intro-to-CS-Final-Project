@@ -61,6 +61,8 @@ int main()
         for(int i = 0; i<7; i++)
         {
             getName(runners[i], i + 1);
+            scores[i] = startScore();
+            
             cout << runners[i] << " has a starting score of " << scores[i] << "\n";
         }
         
