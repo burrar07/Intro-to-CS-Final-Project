@@ -7,7 +7,7 @@
 using namespace std;
 
 void getName(string& name, int number);
-int startScore()
+int startScore(int diffiuclty)
 void chooseWorkout(string workout, int number, int choice);
 int chooseDivision();
 
@@ -61,7 +61,7 @@ int main()
         for(int i = 0; i<7; i++)
         {
             getName(runners[i], i + 1);
-            scores[i] = startScore();
+            scores[i] = startScore(difficulty);
             
             cout << runners[i] << " has a starting score of " << scores[i] << "\n";
         }
@@ -99,21 +99,64 @@ void getName(string& name, int number){
     cin>>name;
 }
 
-int startScore()
+int startScore(int difficulty)
 {
     random_device scoreStarter;
     mt19937 generator(scoreStarter());
-    uniform_int_distribution<int> distribution(1, 100);
+
+    int minScore = 1;
+    int maxScore = 100;
+
+    if (difficulty == 3)
+    {
+        minScore = 60;
+        maxScore = 85;
+    }
+    else if (difficulty == 2)
+    {
+        minScore = 45;
+        maxScore = 75;
+    }
+    else if (difficulty == 1)
+    {
+        minScore = 30;
+        maxScore = 65;
+    }
+
+    uniform_int_distribution<int> distribution(minScore, maxScore);
+
     return distribution(generator);
 }
 
-void chooseWorkout (string workout, int number, int choice){
-    if (number==1){
-        cout<<"Choose the first workout for the week";
-    }
-    else if (number==2){
-        cout<<"Choose the second workout for the week";
-    }
-    cout<<"Options: \n1. Steady State\n2. Mile Repeats\n3. The Eagle\n4. Hill Repeats\n5. 2k Repeats\n6. Premeet\n";
-    cin>>choice;
+void chooseWorkout (string& workout, int number)
+{
+    int choice;
+
+    cout << "\nChoose workout #" << number << " for the week:\n";
+    cout << "1. Steady State\n";
+    cout << "2. Mile Repeats\n";
+    cout << "3. The Eagle\n";
+    cout << "4. Hill Repeats\n";
+    cout << "5. 2k Repeats\n";
+    cout << "6. Premeet\n";
+
+    cout << "\nEnter your choice: ";
+    cin >> choice;
+
+    if (choice == 1)
+        workout = "Steady State";
+    else if (choice == 2)
+        workout = "Mile Repeats";
+    else if (choice == 3)
+        workout = "The Eagle";
+    else if (choice == 4)
+        workout = "Hill Repeats";
+    else if (choice == 5)
+        workout = "2k Repeats";
+    else if (choice == 6)
+        workout = "Premeet";
+    else
+        workout = "Invalid";
+
+    cout << "\nSelected workout: " << workout << "\n";
 }
