@@ -9,6 +9,7 @@ using namespace std;
 void getName(string& name, int number);
 int startScore(string name);
 void chooseWorkout(string workout, int number, int choice);
+int chooseDivision();
 
 //Initial Menu
 int main()
