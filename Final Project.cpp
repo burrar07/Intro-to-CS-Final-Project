@@ -7,7 +7,7 @@
 using namespace std;
 
 void getName(string& name, int number);
-int startScore(string name);
+int startScore()
 void chooseWorkout(string workout, int number, int choice);
 int chooseDivision();
 
@@ -56,10 +56,12 @@ int main()
         //Naming the runners 
         
         string runners[7];
+        int scores[7];
         
         for(int i = 0; i<7; i++)
         {
             getName(runners[i], i + 1);
+            cout << runners[i] << " has a starting score of " << scores[i] << "\n";
         }
         
     }
@@ -95,13 +97,12 @@ void getName(string& name, int number){
     cin>>name;
 }
 
-int startScore(string name){
-    int score;
+int startScore()
+{
     random_device scoreStarter;
     mt19937 generator(scoreStarter());
     uniform_int_distribution<int> distribution(1, 100);
-    score = distribution(generator);
-    return score;
+    return distribution(generator);
 }
 
 void chooseWorkout (string workout, int number, int choice){
