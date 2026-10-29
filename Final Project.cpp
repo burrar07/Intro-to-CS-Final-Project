@@ -15,6 +15,8 @@ struct RunnerStats {
 void getName(string& name, int number);
 int startScore(int diffiuclty)
 void chooseWorkout(string workout, int number, int choice);
+void applyWorkout(Runner& runner, string workout);
+void runWeek(Runner runners[], int runnerCount, int week);
 int chooseDivision();
 
 //Initial Menu
@@ -102,11 +104,6 @@ int chooseDivision()
     return division;
 }
 
-void getName(string& name, int number){
-    cout<<"Enter the name for runner "<<number<<": ";
-    cin>>name;
-}
-
 int startScore(int difficulty)
 {
     random_device scoreStarter;
@@ -167,6 +164,55 @@ void chooseWorkout (string& workout, int number)
         workout = "Invalid";
 
     cout << "\nSelected workout: " << workout << "\n";
+}
+
+void applyWorkout(Runner& runner, string workout) 
+{
+    runner.workout = workout;
+
+    if (workout == "Steady State") {
+        runner.stats.endurance += 6;
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 5;
+    } else if (workout == "Mile Repeats") {
+        runner.stats.speed += 6;
+        runner.stats.endurance += 3;
+        runner.stats.fatigue += 7;
+    } else if (workout == "The Eagle") {
+        runner.stats.endurance += 5;
+        runner.stats.speed += 4;
+        runner.stats.fatigue += 6;
+    } else if (workout == "Hill Repeats") {
+        runner.stats.endurance += 6;
+        runner.stats.speed += 3;
+        runner.stats.fatigue += 10;
+    } else if (workout == "2k Repeats") {
+        runner.stats.speed += 4;
+        runner.stats.endurance += 4;
+        runner.stats.fatigue += 7;
+    } else if (workout == "Premeet") {
+        runner.stats.speed += 1;
+        runner.stats.endurance += 1;
+        runner.stats.fatigue += 2;
+    } else if (workout == "Rest") {
+        runner.stats.fatigue -= 6;
+    }
+
+    // Just makes sure that things can't go too high or too low
+    if (runner.stats.endurance > 100) runner.stats.endurance = 100;
+    if (runner.stats.speed > 100) runner.stats.speed = 100;
+    if (runner.stats.fatigue > 100) runner.stats.fatigue = 100;
+
+    if (runner.stats.fatigue < 0) runner.stats.fatigue = 0;
+    if (runner.stats.endurance < 0) runner.stats.endurance = 0;
+    if (runner.stats.speed < 0) runner.stats.speed = 0;
+}
+
+void getName(string& name, int number)
+{
+    cout<<"Enter the name for runner "<<number<<": ";
+    cin>>name;
+}
 
 RunnerStats generateRunnerStats(int difficulty) {
     RunnerStats stats;
