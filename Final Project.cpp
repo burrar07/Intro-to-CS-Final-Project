@@ -6,6 +6,12 @@
 
 using namespace std;
 
+struct RunnerStats {
+    int endurance;
+    int speed;
+    int fatigue;
+};
+
 void getName(string& name, int number);
 int startScore(int diffiuclty)
 void chooseWorkout(string workout, int number, int choice);
@@ -57,13 +63,15 @@ int main()
         
         string runners[7];
         int scores[7];
+        RunnerStats runnerStats[7];
         
         for(int i = 0; i<7; i++)
         {
             getName(runners[i], i + 1);
             scores[i] = startScore(difficulty);
-            
+
             cout << runners[i] << " has a starting score of " << scores[i] << "\n";
+            cout << "Endurance: " << runnerStats[i].endurance << ", Speed: " << runnerStats[i].speed << ", Fatigue: " << runnerStats[i].fatigue << "\n";
         }
         
     }
@@ -159,4 +167,38 @@ void chooseWorkout (string& workout, int number)
         workout = "Invalid";
 
     cout << "\nSelected workout: " << workout << "\n";
+
+RunnerStats generateRunnerStats(int difficulty) {
+    RunnerStats stats;
+
+    random_device rd;
+    mt19937 gen(rd());
+
+    int enduranceMin = 40, enduranceMax = 95;
+    int speedMin = 35, speedMax = 90;
+    int fatigueMin = 20, fatigueMax = 80;
+
+    if (difficulty == 3) { // Division III
+        enduranceMin = 55; enduranceMax = 95;
+        speedMin = 40; speedMax = 85;
+        fatigueMin = 15; fatigueMax = 30;
+    } else if (difficulty == 2) { // Division II
+        enduranceMin = 50; enduranceMax = 90;
+        speedMin = 35; speedMax = 80;
+        fatigueMin = 25; fatigueMax = 45;
+    } else if (difficulty == 1) { // Division I
+        enduranceMin = 45; enduranceMax = 85;
+        speedMin = 30; speedMax = 75;
+        fatigueMin = 35; fatigueMax = 60;
+    }
+
+    uniform_int_distribution<int> enduranceDist(enduranceMin, enduranceMax);
+    uniform_int_distribution<int> speedDist(speedMin, speedMax);
+    uniform_int_distribution<int> fatigueDist(fatigueMin, fatigueMax);
+
+    stats.endurance = enduranceDist(gen);
+    stats.speed = speedDist(gen);
+    stats.fatigue = fatigueDist(gen);
+
+    return stats;
 }
