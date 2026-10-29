@@ -12,12 +12,19 @@ struct RunnerStats {
     int fatigue;
 };
 
+struct Runner {
+    string name;
+    RunnerStats stats;
+    string workout;
+};
+
 void getName(string& name, int number);
-int startScore(int diffiuclty)
+int startScore(int difficulty);
 void chooseWorkout(string workout, int number, int choice);
 void applyWorkout(Runner& runner, string workout);
 void runWeek(Runner runners[], int runnerCount, int week);
 int chooseDivision();
+RunnerStats generateRunnerStats(int difficulty);
 
 //Initial Menu
 int main()
@@ -71,6 +78,7 @@ int main()
         {
             getName(runners[i], i + 1);
             scores[i] = startScore(difficulty);
+            runnerStats[i] = generateRunnerStats(difficulty);
 
             cout << runners[i] << " has a starting score of " << scores[i] << "\n";
             cout << "Endurance: " << runnerStats[i].endurance << ", Speed: " << runnerStats[i].speed << ", Fatigue: " << runnerStats[i].fatigue << "\n";
