@@ -256,3 +256,23 @@ RunnerStats generateRunnerStats(int difficulty) {
 
     return stats;
 }
+
+void schedule (Runner runner[],int division){
+string workoutChoice;
+    for (int i=1; i<=16;i++){
+if (i!=3&&i!=5&&i!=8&&i!=9&&i!=10&&i!=12&&i!=14&&i!=16)
+        cout<<"Welcome to week "<<i<<". These are the current stats of the runners: \n";
+for (int j=0; j<7;j++){
+    cout<<runner[j].name<<":"<<endl;
+cout << "Endurance: " << runner[j].stats.endurance << ", Speed: " << runner[j].stats.speed << ", Fatigue: " <<runner[j].stats.fatigue << "\n";
+}
+for (int a=1;a<=2;a++){
+chooseWorkout(workoutChoice,a);
+for (int b=0;b<7;b++){
+    applyWorkout(runner[b],workoutChoice);
+}
+}
+if (i==3||i==5||i==8||i==9||i==10||i==12||i==14||i==16){
+//meet week function
+}
+}
