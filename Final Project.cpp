@@ -18,6 +18,7 @@ struct Runner {
     string workout;
 };
 
+
 void getName(string& name, int number);
 int startScore(int difficulty);
 void chooseWorkout(string workout, int number, int choice);
@@ -25,10 +26,27 @@ void applyWorkout(Runner& runner, string workout);
 void runWeek(Runner runners[], int runnerCount, int week);
 int chooseDivision();
 RunnerStats generateRunnerStats(int difficulty);
+const int UCRTimes[25]={1437,1447,1447,1463,1445,1455,1456,1457,1465,1466,1465,1467,1471,1472,1476,1477,1483,1486,1494,1492,1500,1503,1513,1508,1524};
+const int UCRScores[25]={49,97,103,159,178,235,247,251,298,313,315,320,350,366,389,395,440,483,492,497,539,568,579,597,710};
+const int LewisTimes[27]={1487, 1489, 1491, 1494, 1495, 1495, 1502, 1509, 1516, 1522, 1529, 1525, 1542, 1546, 1545, 1546, 1551, 1554, 1557, 1561, 1585, 1585, 1600, 1607, 1607, 1638, 1655};
+const int LewisScores[27]={114, 120, 130, 137, 141, 155, 195, 214, 260, 296, 308, 319, 381, 409, 411, 413, 426, 462, 475, 506, 596, 609, 663, 677, 697, 762, 845};
+const int MarkCovertTimes[9]={1528, 1531, 1535, 1541, 1560, 1578, 1612, 1636, 1655};
+const int MarkCovertScores[9]={54, 59, 68, 92, 119, 153, 200, 224, 240};
+const int HighlanderTimes[16]={1459, 1468, 1469, 1472, 1473, 1476, 1479, 1477, 1485, 1484, 1486, 1485, 1500, 1516, 1531, 1559};
+const int HighlanderScores[16]={76, 124, 131, 151, 154, 177, 192, 199, 215, 219, 221, 224, 286, 374, 390, 487};
+const int ConferenceTimes[10]={1509, 1525, 1527, 1540, 1581, 1660, 1707, 1830, 1950, 2021};
+const int ConferenceScores[10]={35, 53, 57, 72, 130, 179, 202, 252, 262, 280};
+//Note both of these are 10ks
+const int RegionalTimes[23]={1810, 1817, 1819, 1828, 1837, 1857, 1861, 1867, 1892, 1894, 1899, 1903, 1906, 1910, 1921, 1933, 1929, 1930, 1947, 1960, 1991, 2010, 2055};
+const int RegionalScores[23]={75, 88, 97, 126, 141, 190, 206, 223, 299, 304, 317, 324, 338, 346, 379, 402, 402, 425, 455, 493, 599, 642, 695};
+const int NationalsTimes[34]={1810, 1811, 1827, 1828, 1841, 1862, 1873, 1879, 1884, 1885, 1880, 1884, 1891, 1884, 1894, 1895, 1903, 1905, 1913, 1909, 1916, 1912, 1917, 1922, 1926, 1927, 1937, 1935, 1937, 1942, 1947, 1947, 1997, 2064};
+const int NationalsScores[34]={62, 71, 121, 122, 162, 261, 310, 338, 373, 375, 380, 390, 394, 430, 431, 456, 490, 500, 518, 541, 543, 554, 560, 582, 640, 644, 664, 670, 695, 737, 770, 770, 980, 1096};
+const string Schedule[7]={"Mark Covert","UCR","Lewis Invitational","Highlander Invitational","Conference","Regionals","Nationals"};
 
 //Initial Menu
 int main()
 {
+    int meetCount=0;
     cout << "============================\n";
     cout << "       XC MANAGEMENT\n";
     cout << "============================\n";
@@ -260,7 +278,7 @@ RunnerStats generateRunnerStats(int difficulty) {
 void schedule (Runner runner[],int division){
 string workoutChoice;
     for (int i=1; i<=16;i++){
-if (i!=3&&i!=5&&i!=8&&i!=9&&i!=10&&i!=12&&i!=14&&i!=16)
+if (i!=3&&i!=5&&i!=8&&i!=9&&i!=12&&i!=14&&i!=16)
         cout<<"Welcome to week "<<i<<". These are the current stats of the runners: \n";
 for (int j=0; j<7;j++){
     cout<<runner[j].name<<":"<<endl;
@@ -272,7 +290,32 @@ for (int b=0;b<7;b++){
     applyWorkout(runner[b],workoutChoice);
 }
 }
-if (i==3||i==5||i==8||i==9||i==10||i==12||i==14||i==16){
+if (i==3||i==5||i==8||i==9||i==12||i==14||i==16){
 //meet week function
 }
+}
+}
+
+int calc8kTime(RunnerStats& stats){
+    double time = 1803.0- 3.0 * stats.endurance- 1.8 * stats.speed+ 1.5 * stats.fatigue;
+
+    return static_cast<int>(round(time));
+}
+
+void runMeet(Runner runners[],int meetNumber){
+    int runnersTimes[7];
+    int totalTime, averageTime;
+    for (int i=0;i<7;i++){
+        runnersTimes[i]=calc8kTime(runners[i].stats);
+        totalTime+=runnersTimes[i];
+    }
+    averageTime = totalTime / 7;
+    cout<<"Meet Results:\n";
+    for (int i=0;i<7;i++){
+        cout<<runners[i].name<<": "<<runnersTimes[i]/60<<":"<<runnersTimes[i]%60<<endl;
+    }
+}
+
+int calculateScore(int time, int meetNumber, int averageTime){
+    
 }
