@@ -28,10 +28,10 @@ struct OpposingTeam {
 };
 
 OpposingTeam markCovertTeams[4] = {
-    {"Cal State Fullerton", 1510, 0, 0},
-    {"UC Irvine", 1490, 0, 0},
-    {"Concordia Irvine", 1540, 0, 0},
-    {"Azusa Pacific", 1550, 0, 0}
+    { "Cal State Fullerton", 1510, 0, 0 },
+    { "UC Irvine", 1490, 0, 0 },
+    { "Concordia Irvine", 1540, 0, 0 },
+    { "Azusa Pacific", 1550, 0, 0 }
 };
 
 void getName(string& name, int number);
@@ -51,20 +51,20 @@ int calculatePlacement(const int runnersTimes[], const OpposingTeam teams[], int
 void printTime(double seconds);
 int interpolateScore(int time, const int times[], const int scores[], int count);
 
-const int UCRTimes[25]={1437,1447,1447,1463,1445,1455,1456,1457,1465,1466,1465,1467,1471,1472,1476,1477,1483,1486,1494,1492,1500,1503,1513,1508,1524};
-const int UCRScores[25]={49,97,103,159,178,235,247,251,298,313,315,320,350,366,389,395,440,483,492,497,539,568,579,597,710};
-const int LewisTimes[27]={1487,1489,1491,1494,1495,1495,1502,1509,1516,1522,1529,1525,1542,1546,1545,1546,1551,1554,1557,1561,1585,1585,1600,1607,1607,1638,1655};
-const int LewisScores[27]={114,120,130,137,141,155,195,214,260,296,308,319,381,409,411,413,426,462,475,506,596,609,663,677,697,762,845};
-const int MarkCovertTimes[9]={1528,1531,1535,1541,1560,1578,1612,1636,1655};
-const int MarkCovertScores[9]={54,59,68,92,119,153,200,224,240};
-const int HighlanderTimes[16]={1459,1468,1469,1472,1473,1476,1479,1477,1485,1484,1486,1485,1500,1516,1531,1559};
-const int HighlanderScores[16]={76,124,131,151,154,177,192,199,215,219,221,224,286,374,390,487};
-const int ConferenceTimes[10]={1509,1525,1527,1540,1581,1660,1707,1830,1950,2021};
-const int ConferenceScores[10]={35,53,57,72,130,179,202,252,262,280};
-const int RegionalTimes[23]={1810,1817,1819,1828,1837,1857,1861,1867,1892,1894,1899,1903,1906,1910,1921,1933,1929,1930,1947,1960,1991,2010,2055};
-const int RegionalScores[23]={75,88,97,126,141,190,206,223,299,304,317,324,338,346,379,402,402,425,455,493,599,642,695};
-const int NationalsTimes[34]={1810,1811,1827,1828,1841,1862,1873,1879,1884,1885,1880,1884,1891,1884,1894,1895,1903,1905,1913,1909,1916,1912,1917,1922,1926,1927,1937,1935,1937,1942,1947,1947,1997,2064};
-const int NationalsScores[34]={62,71,121,122,162,261,310,338,373,375,380,390,394,430,431,456,490,500,518,541,543,554,560,582,640,644,664,670,695,737,770,770,980,1096};
+const int UCRTimes[25] = { 1437,1447,1447,1463,1445,1455,1456,1457,1465,1466,1465,1467,1471,1472,1476,1477,1483,1486,1494,1492,1500,1503,1513,1508,1524 };
+const int UCRScores[25] = { 49,97,103,159,178,235,247,251,298,313,315,320,350,366,389,395,440,483,492,497,539,568,579,597,710 };
+const int LewisTimes[27] = { 1487,1489,1491,1494,1495,1495,1502,1509,1516,1522,1529,1525,1542,1546,1545,1546,1551,1554,1557,1561,1585,1585,1600,1607,1607,1638,1655 };
+const int LewisScores[27] = { 114,120,130,137,141,155,195,214,260,296,308,319,381,409,411,413,426,462,475,506,596,609,663,677,697,762,845 };
+const int MarkCovertTimes[9] = { 1528,1531,1535,1541,1560,1578,1612,1636,1655 };
+const int MarkCovertScores[9] = { 54,59,68,92,119,153,200,224,240 };
+const int HighlanderTimes[16] = { 1459,1468,1469,1472,1473,1476,1479,1477,1485,1484,1486,1485,1500,1516,1531,1559 };
+const int HighlanderScores[16] = { 76,124,131,151,154,177,192,199,215,219,221,224,286,374,390,487 };
+const int ConferenceTimes[10] = { 1509,1525,1527,1540,1581,1660,1707,1830,1950,2021 };
+const int ConferenceScores[10] = { 35,53,57,72,130,179,202,252,262,280 };
+const int RegionalTimes[23] = { 1810,1817,1819,1828,1837,1857,1861,1867,1892,1894,1899,1903,1906,1910,1921,1933,1929,1930,1947,1960,1991,2010,2055 };
+const int RegionalScores[23] = { 75,88,97,126,141,190,206,223,299,304,317,324,338,346,379,402,402,425,455,493,599,642,695 };
+const int NationalsTimes[34] = { 1810,1811,1827,1828,1841,1862,1873,1879,1884,1885,1880,1884,1891,1884,1894,1895,1903,1905,1913,1909,1916,1912,1917,1922,1926,1927,1937,1935,1937,1942,1947,1947,1997,2064 };
+const int NationalsScores[34] = { 62,71,121,122,162,261,310,338,373,375,380,390,394,430,431,456,490,500,518,541,543,554,560,582,640,644,664,670,695,737,770,770,980,1096 };
 
 const string Schedule[7] = {
     "Mark Covert",
@@ -164,13 +164,13 @@ int main() {
         runners[i].workout = "";
 
         cout << runners[i].name
-             << " has a starting score of "
-             << score << "\n";
+            << " has a starting score of "
+            << score << "\n";
 
         cout << "Endurance: " << runners[i].stats.endurance
-             << ", Speed: " << runners[i].stats.speed
-             << ", Fatigue: " << runners[i].stats.fatigue
-             << "\n";
+            << ", Speed: " << runners[i].stats.speed
+            << ", Fatigue: " << runners[i].stats.fatigue
+            << "\n";
     }
 
     schedule(runners, division);
@@ -248,47 +248,45 @@ void chooseWorkout(string& workout, int number) {
     cout << "\nSelected workout: " << workout << "\n";
 }
 
+
+
 void applyWorkout(Runner& runner, string workout) {
     runner.workout = workout;
 
     if (workout == "Steady State") {
-        runner.stats.endurance += 6;
-        runner.stats.speed += 2;
-        runner.stats.fatigue += 5;
+        runner.stats.endurance += 2;
+        runner.stats.fatigue += 3;
     }
     else if (workout == "Mile Repeats") {
-        runner.stats.speed += 6;
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 4;
+    }
+    else if (workout == "The Eagle") {
+        runner.stats.endurance += 2;
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 9;
+    }
+    else if (workout == "Hill Repeats") {
         runner.stats.endurance += 3;
         runner.stats.fatigue += 7;
     }
-    else if (workout == "The Eagle") {
-        runner.stats.endurance += 5;
-        runner.stats.speed += 4;
+    else if (workout == "2k Repeats") {
+        runner.stats.endurance += 1;
+        runner.stats.speed += 2;
         runner.stats.fatigue += 6;
     }
-    else if (workout == "Hill Repeats") {
-        runner.stats.endurance += 6;
-        runner.stats.speed += 3;
-        runner.stats.fatigue += 10;
-    }
-    else if (workout == "2k Repeats") {
-        runner.stats.speed += 4;
-        runner.stats.endurance += 4;
-        runner.stats.fatigue += 7;
-    }
     else if (workout == "Premeet") {
-        runner.stats.speed += 1;
-        runner.stats.endurance += 1;
-        runner.stats.fatigue -= 3;
+        runner.stats.fatigue -= 7;
     }
     else if (workout == "Rest") {
-        runner.stats.fatigue -= 6;
+        runner.stats.fatigue -= 12;
     }
 
     runner.stats.endurance = clamp(runner.stats.endurance, 0, 100);
     runner.stats.speed = clamp(runner.stats.speed, 0, 100);
     runner.stats.fatigue = clamp(runner.stats.fatigue, 0, 100);
 }
+
 
 void getName(string& name, int number) {
     cout << "Enter the name for runner " << number << ": ";
@@ -299,36 +297,36 @@ RunnerStats generateRunnerStats(int difficulty) {
     random_device rd;
     mt19937 gen(rd());
 
-    int enduranceMin = 40;
-    int enduranceMax = 95;
-    int speedMin = 35;
-    int speedMax = 90;
-    int fatigueMin = 20;
-    int fatigueMax = 80;
+    int enduranceMin, enduranceMax;
+    int speedMin, speedMax;
+    int fatigueMin, fatigueMax;
 
     if (difficulty == 3) {
-        enduranceMin = 55;
-        enduranceMax = 95;
+        // Division III
+        enduranceMin = 45;
+        enduranceMax = 65;
         speedMin = 40;
-        speedMax = 85;
-        fatigueMin = 15;
-        fatigueMax = 30;
-    }
-    else if (difficulty == 2) {
-        enduranceMin = 50;
-        enduranceMax = 90;
-        speedMin = 35;
-        speedMax = 80;
+        speedMax = 60;
         fatigueMin = 25;
         fatigueMax = 45;
     }
-    else if (difficulty == 1) {
-        enduranceMin = 45;
-        enduranceMax = 85;
-        speedMin = 30;
-        speedMax = 75;
-        fatigueMin = 35;
-        fatigueMax = 60;
+    else if (difficulty == 2) {
+        // Division II
+        enduranceMin = 50;
+        enduranceMax = 70;
+        speedMin = 45;
+        speedMax = 65;
+        fatigueMin = 20;
+        fatigueMax = 40;
+    }
+    else {
+        // Division I
+        enduranceMin = 55;
+        enduranceMax = 75;
+        speedMin = 50;
+        speedMax = 70;
+        fatigueMin = 15;
+        fatigueMax = 35;
     }
 
     uniform_int_distribution<int> enduranceDist(enduranceMin, enduranceMax);
@@ -342,6 +340,7 @@ RunnerStats generateRunnerStats(int difficulty) {
     stats.fatigue = fatigueDist(gen);
 
     return stats;
+
 }
 
 void schedule(Runner runner[], int division) {
@@ -356,9 +355,9 @@ void schedule(Runner runner[], int division) {
             cout << runner[j].name << ":\n";
 
             cout << "Endurance: " << runner[j].stats.endurance
-                 << ", Speed: " << runner[j].stats.speed
-                 << ", Fatigue: " << runner[j].stats.fatigue
-                 << "\n";
+                << ", Speed: " << runner[j].stats.speed
+                << ", Fatigue: " << runner[j].stats.fatigue
+                << "\n";
         }
 
         for (int a = 1; a <= 2; a++) {
@@ -378,7 +377,7 @@ void schedule(Runner runner[], int division) {
         }
 
         for (int j = 0; j < 7; j++) {
-            runner[j].stats.fatigue -= 10;
+            runner[j].stats.fatigue -= 3;
 
             if (runner[j].stats.fatigue < 0) {
                 runner[j].stats.fatigue = 0;
@@ -388,10 +387,10 @@ void schedule(Runner runner[], int division) {
 }
 
 int calc8kTime(const RunnerStats& stats) {
-    double time = 1803.0
-                - 3.0 * stats.endurance
-                - 1.8 * stats.speed
-                + 1.5 * stats.fatigue;
+    double time = 1700.0
+        - 2.0 * stats.endurance
+        - 1.2 * stats.speed
+        + 1.2 * stats.fatigue;
 
     return static_cast<int>(round(time));
 }
@@ -406,9 +405,9 @@ void printTime(double seconds) {
     int tenths = static_cast<int>(round(seconds * 10));
 
     cout << tenths / 600 << ":"
-         << setfill('0') << setw(2) << (tenths / 10) % 60
-         << "." << tenths % 10
-         << setfill(' ');
+        << setfill('0') << setw(2) << (tenths / 10) % 60
+        << "." << tenths % 10
+        << setfill(' ');
 }
 
 void runMeet(Runner runners[], int meetNumber, int division) {
@@ -456,7 +455,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
         printTime(runnersTimes[i]);
 
         cout << " | Historical score estimate: "
-             << runnersScores[i] << "\n";
+            << runnersScores[i] << "\n";
     }
 
     int sortedScores[7];
@@ -474,7 +473,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
     }
 
     cout << "\nHistorical Team Score Estimate: "
-         << teamScore << "\n";
+        << teamScore << "\n";
 
     if (teamScore < 300) {
         cout << "Team Performance: Excellent\n";
@@ -514,7 +513,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
         );
 
         cout << "\nESTIMATED TEAM PLACEMENT: "
-             << placement << " out of 5 teams\n";
+            << placement << " out of 5 teams\n";
 
         cout << "(Based on top-five average times, ";
         cout << "not official XC scoring.)\n";
@@ -524,7 +523,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
 }
 
 int interpolateScore(int time, const int times[],
-                     const int scores[], int count) {
+    const int scores[], int count) {
 
     int lower = -1;
     int upper = -1;
@@ -554,7 +553,7 @@ int interpolateScore(int time, const int times[],
     }
 
     double fraction = double(time - times[lower])
-                    / (times[upper] - times[lower]);
+        / (times[upper] - times[lower]);
 
     return static_cast<int>(round(
         scores[lower] +
@@ -606,7 +605,7 @@ int calculateScore(int time, int meetNumber, int averageTime) {
 }
 
 void nationalComparison(const int runnersTimes[],
-                        int division, int meetNumber) {
+    int division, int meetNumber) {
 
     int times[7];
 
@@ -615,7 +614,7 @@ void nationalComparison(const int runnersTimes[],
         if (meetNumber >= 5) {
             times[i] = static_cast<int>(
                 round(runnersTimes[i] / 1.27)
-            );
+                );
         }
         else {
             times[i] = runnersTimes[i];
@@ -663,7 +662,7 @@ void nationalComparison(const int runnersTimes[],
         cout << "): ";
 
         cout << fixed << setprecision(1)
-             << abs(difference) << " seconds ";
+            << abs(difference) << " seconds ";
 
         if (difference > 0) {
             cout << "behind\n";
@@ -689,8 +688,8 @@ void simulateOpponents(OpposingTeam teams[], int teamCount) {
 }
 
 int calculatePlacement(const int runnersTimes[],
-                       const OpposingTeam teams[],
-                       int teamCount) {
+    const OpposingTeam teams[],
+    int teamCount) {
 
     int times[7];
 
@@ -715,6 +714,5 @@ int calculatePlacement(const int runnersTimes[],
             placement++;
         }
     }
-
     return placement;
 }
