@@ -279,7 +279,7 @@ void applyWorkout(Runner& runner, string workout) {
         runner.stats.fatigue -= 7;
     }
     else if (workout == "Rest") {
-        runner.stats.fatigue -= 12;
+        runner.stats.fatigue -= 15;
     }
 
     runner.stats.endurance = clamp(runner.stats.endurance, 0, 100);
