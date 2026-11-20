@@ -532,6 +532,7 @@ void showIntroduction() {
     cout << "- Lower team scores are better.\n";
     cout << "- Your sixth and seventh runners break ties.\n";
     cout << "- You need at least five finishers to score.\n";
+    cout << "- Regular season races are 8K races.\n\n";
     cout << "- Regionals and Nationals are 10K races.\n\n";
 
     cout << "HOW TO REACH NATIONALS\n";
