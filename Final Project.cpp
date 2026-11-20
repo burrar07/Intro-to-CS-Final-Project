@@ -1,11 +1,12 @@
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 #include <random>
 #include <string>
 #include <cmath>
 #include <limits>
 #include <algorithm>
+#include <vector>
+
 using namespace std;
 
 struct RunnerStats {
@@ -23,60 +24,18 @@ struct Runner {
 struct OpposingTeam {
     string name;
     int averageTime;
-    int raceTime;
-    int teamScore;
 };
 
-const int opponentCounts[7] = {
-    9,   // Mark Covert
-    19,  // UCR
-    24,  // Lewis
-    19,  // Highlander
-    11,  // Conference
-    24,  // Regionals
-    31   // Nationals
+struct RaceFinisher {
+    string team;
+    string runner;
+    int time;
+    int place;
 };
 
-OpposingTeam markCovertTeams[4] = {
-    { "Cal State Fullerton", 1510, 0, 0 },
-    { "UC Irvine", 1490, 0, 0 },
-    { "Concordia Irvine", 1540, 0, 0 },
-    { "Azusa Pacific", 1550, 0, 0 }
-};
-
-void getName(string& name, int number);
-int startScore(int difficulty);
-void chooseWorkout(string& workout, int number);
-void applyWorkout(Runner& runner, string workout);
-int chooseDivision();
-RunnerStats generateRunnerStats(int difficulty);
-void schedule(Runner runners[], int division);
-int calc8kTime(const RunnerStats& stats);
-int calc10kTime(const RunnerStats& stats);
-void runMeet(Runner runners[], int meetNumber, int division);
-int calculateScore(int time, int meetNumber, int averageTime);
-void nationalComparison(const int runnersTimes[], int division, int meetNumber);
-void simulateOpponents(OpposingTeam teams[], int teamCount);
-int calculatePlacement(const int runnersTimes[], const OpposingTeam teams[], int teamCount);
-void printTime(double seconds);
-int interpolateScore(int time, const int times[], const int scores[], int count);
-void selectOpponents(int meetNumber, int division);
-
-const int UCRTimes[25] = { 1437,1447,1447,1463,1445,1455,1456,1457,1465,1466,1465,1467,1471,1472,1476,1477,1483,1486,1494,1492,1500,1503,1513,1508,1524 };
-const int UCRScores[25] = { 49,97,103,159,178,235,247,251,298,313,315,320,350,366,389,395,440,483,492,497,539,568,579,597,710 };
-const int LewisTimes[27] = { 1487,1489,1491,1494,1495,1495,1502,1509,1516,1522,1529,1525,1542,1546,1545,1546,1551,1554,1557,1561,1585,1585,1600,1607,1607,1638,1655 };
-const int LewisScores[27] = { 114,120,130,137,141,155,195,214,260,296,308,319,381,409,411,413,426,462,475,506,596,609,663,677,697,762,845 };
-const int MarkCovertTimes[9] = { 1528,1531,1535,1541,1560,1578,1612,1636,1655 };
-const int MarkCovertScores[9] = { 54,59,68,92,119,153,200,224,240 };
-const int HighlanderTimes[16] = { 1459,1468,1469,1472,1473,1476,1479,1477,1485,1484,1486,1485,1500,1516,1531,1559 };
-const int HighlanderScores[16] = { 76,124,131,151,154,177,192,199,215,219,221,224,286,374,390,487 };
-const int ConferenceTimes[10] = { 1509,1525,1527,1540,1581,1660,1707,1830,1950,2021 };
-const int ConferenceScores[10] = { 35,53,57,72,130,179,202,252,262,280 };
-const int RegionalTimes[23] = { 1810,1817,1819,1828,1837,1857,1861,1867,1892,1894,1899,1903,1906,1910,1921,1933,1929,1930,1947,1960,1991,2010,2055 };
-const int RegionalScores[23] = { 75,88,97,126,141,190,206,223,299,304,317,324,338,346,379,402,402,425,455,493,599,642,695 };
-const int NationalsTimes[34] = { 1810,1811,1827,1828,1841,1862,1873,1879,1884,1885,1880,1884,1891,1884,1894,1895,1903,1905,1913,1909,1916,1912,1917,1922,1926,1927,1937,1935,1937,1942,1947,1947,1997,2064 };
-const int NationalsScores[34] = { 62,71,121,122,162,261,310,338,373,375,380,390,394,430,431,456,490,500,518,541,543,554,560,582,640,644,664,670,695,737,770,770,980,1096 };
-
+// ========================================================================
+// MEET AND NATIONAL REFERENCE DATA
+// ========================================================================
 const string Schedule[7] = {
     "Mark Covert",
     "UCR",
@@ -137,6 +96,28 @@ const double D3NationalAverage[3] = {
     1459.7
 };
 
+// ========================================================================
+// FUNCTION DECLARATIONS
+// ========================================================================
+int chooseDivision();
+void getName(string& name, int number);
+int startScore(int difficulty);
+RunnerStats generateRunnerStats(int difficulty);
+void chooseWorkout(string& workout, int number);
+void applyWorkout(Runner& runner, string workout);
+void schedule(Runner runners[], int division);
+int calc8kTime(const RunnerStats& stats);
+int calc10kTime(const RunnerStats& stats);
+int calculateCourseEffect(const RunnerStats& stats, int meetNumber);
+void printTime(double seconds);
+void runMeet(Runner runners[], int meetNumber, int division);
+vector<OpposingTeam> selectOpponents(int meetNumber, int division);
+void calculateXCResults(const int runnersTimes[], const Runner runners[], vector<OpposingTeam>& teams, int meetNumber);
+void nationalComparison(const int runnersTimes[], int division, int meetNumber);
+
+// ========================================================================
+// GAME SETUP
+// ========================================================================
 int main() {
     cout << "============================\n";
     cout << "       XC MANAGEMENT\n";
@@ -218,6 +199,11 @@ int chooseDivision() {
     return division;
 }
 
+void getName(string& name, int number) {
+    cout << "Enter the name for runner " << number << ": ";
+    getline(cin >> ws, name);
+}
+
 int startScore(int difficulty) {
     random_device rd;
     mt19937 gen(rd());
@@ -241,82 +227,6 @@ int startScore(int difficulty) {
     uniform_int_distribution<int> distribution(minScore, maxScore);
 
     return distribution(gen);
-}
-
-void chooseWorkout(string& workout, int number) {
-    int choice;
-
-    cout << "\nChoose workout #" << number << " for the week:\n";
-    cout << "1. Steady State\n";
-    cout << "2. Mile Repeats\n";
-    cout << "3. The Eagle\n";
-    cout << "4. Hill Repeats\n";
-    cout << "5. 2k Repeats\n";
-    cout << "6. Premeet\n";
-
-    cout << "\nEnter your choice: ";
-
-    if (!(cin >> choice)) {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        choice = 0;
-    }
-
-    if (choice == 1) workout = "Steady State";
-    else if (choice == 2) workout = "Mile Repeats";
-    else if (choice == 3) workout = "The Eagle";
-    else if (choice == 4) workout = "Hill Repeats";
-    else if (choice == 5) workout = "2k Repeats";
-    else if (choice == 6) workout = "Premeet";
-    else if (choice == 7) workout = "Rest";
-    else workout = "Rest";
-
-    cout << "\nSelected workout: " << workout << "\n";
-}
-
-
-
-void applyWorkout(Runner& runner, string workout) {
-    runner.workout = workout;
-
-    if (workout == "Steady State") {
-        runner.stats.endurance += 2;
-        runner.stats.fatigue += 3;
-    }
-    else if (workout == "Mile Repeats") {
-        runner.stats.speed += 2;
-        runner.stats.fatigue += 4;
-    }
-    else if (workout == "The Eagle") {
-        runner.stats.endurance += 2;
-        runner.stats.speed += 2;
-        runner.stats.fatigue += 9;
-    }
-    else if (workout == "Hill Repeats") {
-        runner.stats.endurance += 3;
-        runner.stats.fatigue += 7;
-    }
-    else if (workout == "2k Repeats") {
-        runner.stats.endurance += 1;
-        runner.stats.speed += 2;
-        runner.stats.fatigue += 6;
-    }
-    else if (workout == "Premeet") {
-        runner.stats.fatigue -= 7;
-    }
-    else if (workout == "Rest") {
-        runner.stats.fatigue -= 15;
-    }
-
-    runner.stats.endurance = clamp(runner.stats.endurance, 0, 100);
-    runner.stats.speed = clamp(runner.stats.speed, 0, 100);
-    runner.stats.fatigue = clamp(runner.stats.fatigue, 0, 100);
-}
-
-
-void getName(string& name, int number) {
-    cout << "Enter the name for runner " << number << ": ";
-    getline(cin >> ws, name);
 }
 
 RunnerStats generateRunnerStats(int difficulty) {
@@ -369,6 +279,81 @@ RunnerStats generateRunnerStats(int difficulty) {
 
 }
 
+// ========================================================================
+// TRAINING
+// ========================================================================
+void chooseWorkout(string& workout, int number) {
+    int choice;
+
+    cout << "\nChoose workout #" << number << " for the week:\n";
+    cout << "1. Steady State\n";
+    cout << "2. Mile Repeats\n";
+    cout << "3. The Eagle\n";
+    cout << "4. Hill Repeats\n";
+    cout << "5. 2k Repeats\n";
+    cout << "6. Premeet\n";
+    cout << "7. Rest\n";
+
+    cout << "\nEnter your choice: ";
+
+    if (!(cin >> choice)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        choice = 0;
+    }
+
+    if (choice == 1) workout = "Steady State";
+    else if (choice == 2) workout = "Mile Repeats";
+    else if (choice == 3) workout = "The Eagle";
+    else if (choice == 4) workout = "Hill Repeats";
+    else if (choice == 5) workout = "2k Repeats";
+    else if (choice == 6) workout = "Premeet";
+    else if (choice == 7) workout = "Rest";
+    else workout = "Rest";
+
+    cout << "\nSelected workout: " << workout << "\n";
+}
+
+void applyWorkout(Runner& runner, string workout) {
+    runner.workout = workout;
+
+    if (workout == "Steady State") {
+        runner.stats.endurance += 2;
+        runner.stats.fatigue += 3;
+    }
+    else if (workout == "Mile Repeats") {
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 4;
+    }
+    else if (workout == "The Eagle") {
+        runner.stats.endurance += 2;
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 9;
+    }
+    else if (workout == "Hill Repeats") {
+        runner.stats.endurance += 3;
+        runner.stats.fatigue += 7;
+    }
+    else if (workout == "2k Repeats") {
+        runner.stats.endurance += 1;
+        runner.stats.speed += 2;
+        runner.stats.fatigue += 6;
+    }
+    else if (workout == "Premeet") {
+        runner.stats.fatigue -= 7;
+    }
+    else if (workout == "Rest") {
+        runner.stats.fatigue -= 15;
+    }
+
+    runner.stats.endurance = clamp(runner.stats.endurance, 0, 100);
+    runner.stats.speed = clamp(runner.stats.speed, 0, 100);
+    runner.stats.fatigue = clamp(runner.stats.fatigue, 0, 100);
+}
+
+// ========================================================================
+// SEASON SCHEDULE
+// ========================================================================
 void schedule(Runner runner[], int division) {
     int meetCount = 0;
     string workoutChoice;
@@ -412,6 +397,9 @@ void schedule(Runner runner[], int division) {
     }
 }
 
+// ========================================================================
+// RACE TIME CALCULATIONS
+// ========================================================================
 int calc8kTime(const RunnerStats& stats) {
     double time = 1700.0
         - 2.0 * stats.endurance
@@ -427,15 +415,6 @@ int calc10kTime(const RunnerStats& stats) {
     return static_cast<int>(round(time8k * 1.27));
 }
 
-void printTime(double seconds) {
-    int tenths = static_cast<int>(round(seconds * 10));
-
-    cout << tenths / 600 << ":"
-        << setfill('0') << setw(2) << (tenths / 10) % 60
-        << "." << tenths % 10
-        << setfill(' ');
-}
-
 int calculateCourseEffect(const RunnerStats& stats, int meetNumber) {
     int adjustment = courseTimeAdjustment[meetNumber];
 
@@ -447,9 +426,20 @@ int calculateCourseEffect(const RunnerStats& stats, int meetNumber) {
     return adjustment;
 }
 
+void printTime(double seconds) {
+    int tenths = static_cast<int>(round(seconds * 10));
+
+    cout << tenths / 600 << ":"
+        << setfill('0') << setw(2) << (tenths / 10) % 60
+        << "." << tenths % 10
+        << setfill(' ');
+}
+
+// ========================================================================
+// MEET SIMULATION
+// ========================================================================
 void runMeet(Runner runners[], int meetNumber, int division) {
     int runnersTimes[7];
-    int runnersScores[7];
     int totalTime = 0;
 
     random_device rd;
@@ -476,14 +466,6 @@ void runMeet(Runner runners[], int meetNumber, int division) {
         totalTime += runnersTimes[i];
     }
 
-    int averageTime = totalTime / 7;
-
-    for (int i = 0; i < 7; i++) {
-        runnersScores[i] = calculateScore(
-            runnersTimes[i], meetNumber, averageTime
-        );
-    }
-
     cout << "\n============================\n";
     cout << Schedule[meetNumber] << " Results\n";
     cout << "Course Difficulty: "
@@ -493,157 +475,527 @@ void runMeet(Runner runners[], int meetNumber, int division) {
     for (int i = 0; i < 7; i++) {
         cout << runners[i].name << ": ";
         printTime(runnersTimes[i]);
-
-        cout << " | Historical score estimate: "
-            << runnersScores[i] << "\n";
-    }
-
-    int sortedScores[7];
-
-    for (int i = 0; i < 7; i++) {
-        sortedScores[i] = runnersScores[i];
-    }
-
-    sort(sortedScores, sortedScores + 7);
-
-    int teamScore = 0;
-
-    for (int i = 0; i < 5; i++) {
-        teamScore += sortedScores[i];
-    }
-
-    cout << "\nHistorical Team Score Estimate: "
-        << teamScore << "\n";
-
-    if (teamScore < 300) {
-        cout << "Team Performance: Excellent\n";
-    }
-    else if (teamScore < 500) {
-        cout << "Team Performance: Great\n";
-    }
-    else if (teamScore < 750) {
-        cout << "Team Performance: Good\n";
-    }
-    else if (teamScore < 1000) {
-        cout << "Team Performance: Average\n";
-    }
-    else {
-        cout << "Team Performance: Needs Improvement\n";
+        cout << "\n";
     }
 
     cout << "Average Team Time (all 7): ";
     printTime(totalTime / 7.0);
     cout << "\n";
 
-    // Mark Covert opposing team simulation
-    if (meetNumber == 0) {
-        simulateOpponents(markCovertTeams, 4);
-
-        cout << "\nOPPOSING TEAM PERFORMANCES ";
-        cout << "(TOP-FIVE AVERAGES)\n";
-
-        for (int i = 0; i < 4; i++) {
-            cout << markCovertTeams[i].name << ": ";
-            printTime(markCovertTeams[i].raceTime);
-            cout << "\n";
-        }
-
-        int placement = calculatePlacement(
-            runnersTimes, markCovertTeams, 4
-        );
-
-        cout << "\nESTIMATED TEAM PLACEMENT: "
-            << placement << " out of 5 teams\n";
-
-        cout << "(Based on top-five average times, ";
-        cout << "not official XC scoring.)\n";
-    }
-
+    vector<OpposingTeam> teams = selectOpponents(meetNumber, division);
+    
+    calculateXCResults(runnersTimes, runners, teams, meetNumber);
+        
     nationalComparison(runnersTimes, division, meetNumber);
 }
 
-int interpolateScore(int time, const int times[],
-    const int scores[], int count) {
-
-    int lower = -1;
-    int upper = -1;
-
-    for (int i = 0; i < count; i++) {
-        if (times[i] <= time &&
-            (lower == -1 || times[i] > times[lower])) {
-            lower = i;
-        }
-
-        if (times[i] >= time &&
-            (upper == -1 || times[i] < times[upper])) {
-            upper = i;
-        }
-    }
-
-    if (lower == -1) {
-        return scores[upper];
-    }
-
-    if (upper == -1) {
-        return scores[lower];
-    }
-
-    if (times[lower] == times[upper]) {
-        return scores[lower];
-    }
-
-    double fraction = double(time - times[lower])
-        / (times[upper] - times[lower]);
-
-    return static_cast<int>(round(
-        scores[lower] +
-        fraction * (scores[upper] - scores[lower])
-    ));
-}
-
-int calculateScore(int time, int meetNumber, int averageTime) {
-    // Reserved for future scoring adjustments
-    (void)averageTime;
+vector<OpposingTeam> selectOpponents(int meetNumber, int division) {
+    vector<string> names;
 
     if (meetNumber == 0) {
-        return interpolateScore(
-            time, MarkCovertTimes, MarkCovertScores, 9
-        );
+        names = {
+            "Cal State Fullerton",
+            "UC Irvine",
+            "Cal Poly Pomona",
+            "Concordia Irvine",
+            "Azusa Pacific",
+            "Westmont",
+            "Cal State LA",
+            "Vanguard",
+            "Chapman"
+        };
     }
     else if (meetNumber == 1) {
-        return interpolateScore(
-            time, UCRTimes, UCRScores, 25
-        );
+        names = {
+            "Cal Poly SLO",
+            "UC Davis",
+            "UC Irvine",
+            "UC Riverside",
+            "UC San Diego",
+            "UCLA",
+            "Chico State",
+            "Cal Poly Pomona",
+            "Cal State Fullerton",
+            "Long Beach State",
+            "Cal State San Marcos",
+            "Pepperdine",
+            "Loyola Marymount",
+            "San Diego",
+            "Concordia Irvine",
+            "Westmont",
+            "Vanguard",
+            "USC",
+            "San Diego State"
+        };
     }
     else if (meetNumber == 2) {
-        return interpolateScore(
-            time, LewisTimes, LewisScores, 27
-        );
+        names = {
+            "Grand Valley State",
+            "Lewis",
+            "Augustana (SD)",
+            "Minnesota State",
+            "Michigan Tech",
+            "Saginaw Valley State",
+            "Cedarville",
+            "Walsh",
+            "Hillsdale",
+            "Indianapolis",
+            "Wayne State",
+            "Missouri S&T",
+            "Ashland",
+            "Findlay",
+            "Davenport",
+            "Northern Michigan",
+            "Wisconsin-Parkside",
+            "Ferris State",
+            "Sioux Falls",
+            "Truman State",
+            "Drury",
+            "Malone",
+            "Tiffin",
+            "Southern Indiana"
+        };
     }
     else if (meetNumber == 3) {
-        return interpolateScore(
-            time, HighlanderTimes, HighlanderScores, 16
-        );
+        names = {
+            "Cal Poly SLO",
+            "UC Davis",
+            "UC Irvine",
+            "UC Riverside",
+            "UC San Diego",
+            "Chico State",
+            "Cal Poly Pomona",
+            "UCLA",
+            "Cal State Fullerton",
+            "Long Beach State",
+            "Cal State San Marcos",
+            "Stanislaus State",
+            "Azusa Pacific",
+            "Concordia Irvine",
+            "Westmont",
+            "Loyola Marymount",
+            "Pepperdine",
+            "Vanguard",
+            "Cal State LA"
+        };
     }
     else if (meetNumber == 4) {
-        return interpolateScore(
-            time, ConferenceTimes, ConferenceScores, 10
-        );
+        if (division == 1) {
+            names = {
+                "Pomona-Pitzer",
+                "Claremont-Mudd-Scripps",
+                "Occidental",
+                "Redlands",
+                "Caltech",
+                "Chapman",
+                "La Verne",
+                "Whittier"
+            };
+        }
+        else if (division == 2) {
+            names = {
+                "Westmont",
+                "Concordia Irvine",
+                "Vanguard",
+                "Academy of Art",
+                "Jessup",
+                "Dominican (CA)",
+                "Hawaii Pacific",
+                "Chaminade"
+            };
+        }
+        else {
+            names = {
+                "Cal Poly SLO",
+                "UC Davis",
+                "UC Irvine",
+                "UC Riverside",
+                "UC San Diego",
+                "Cal State Fullerton",
+                "Long Beach State",
+                "Cal State Bakersfield",
+                "Hawaii"
+            };
+        }
     }
     else if (meetNumber == 5) {
-        return interpolateScore(
-            time, RegionalTimes, RegionalScores, 23
-        );
+        if (division == 1) {
+            names = {
+                "Pomona-Pitzer",
+                "Claremont-Mudd-Scripps",
+                "George Fox",
+                "UC Santa Cruz",
+                "Whitworth",
+                "Pacific Lutheran",
+                "Willamette",
+                "Lewis & Clark",
+                "Whitman",
+                "Occidental",
+                "Redlands",
+                "Caltech",
+                "Chapman",
+                "La Verne",
+                "Whittier",
+                "Linfield",
+                "Pacific (OR)",
+                "Puget Sound",
+                "Colorado College",
+                "Trinity (TX)",
+                "Southwestern (TX)",
+                "Texas Lutheran",
+                "Hardin-Simmons",
+                "McMurry"
+            };
+        }
+        else if (division == 2) {
+            names = {
+                "Chico State",
+                "Cal Poly Pomona",
+                "Western Washington",
+                "Alaska Anchorage",
+                "Cal State San Marcos",
+                "Western Oregon",
+                "Stanislaus State",
+                "Simon Fraser",
+                "Northwest Nazarene",
+                "Seattle Pacific",
+                "Westmont",
+                "Concordia Irvine",
+                "Vanguard",
+                "Cal State LA",
+                "San Francisco State",
+                "Cal Poly Humboldt",
+                "Academy of Art",
+                "Cal State East Bay",
+                "Cal State Monterey Bay",
+                "Saint Martin's",
+                "Jessup",
+                "Dominican (CA)",
+                "Hawaii Pacific",
+                "Chaminade"
+            };
+        }
+        else {
+            names = {
+                "Oregon",
+                "Stanford",
+                "Washington",
+                "Gonzaga",
+                "Portland",
+                "Boise State",
+                "California",
+                "Cal Poly SLO",
+                "UC Davis",
+                "Washington State",
+                "Oregon State",
+                "San Francisco",
+                "Santa Clara",
+                "UC Irvine",
+                "UC Riverside",
+                "UC San Diego",
+                "UCLA",
+                "Sacramento State",
+                "Fresno State",
+                "Loyola Marymount",
+                "Pepperdine",
+                "San Jose State",
+                "Pacific",
+                "USC"
+            };
+        }
     }
     else if (meetNumber == 6) {
-        return interpolateScore(
-            time, NationalsTimes, NationalsScores, 34
-        );
+        if (division == 1) {
+            names = {
+                "UW-La Crosse",
+                "North Central (IL)",
+                "MIT",
+                "Pomona-Pitzer",
+                "Wartburg",
+                "SUNY Geneseo",
+                "Johns Hopkins",
+                "UW-Whitewater",
+                "Williams",
+                "RPI",
+                "Carnegie Mellon",
+                "Washington University",
+                "UW-Eau Claire",
+                "UW-Stout",
+                "UW-Oshkosh",
+                "St. Olaf",
+                "Carleton",
+                "Tufts",
+                "Amherst",
+                "Middlebury",
+                "Colby",
+                "Bates",
+                "Haverford",
+                "Dickinson",
+                "Lynchburg",
+                "Emory",
+                "Calvin",
+                "Hope",
+                "George Fox",
+                "Claremont-Mudd-Scripps",
+                "Case Western Reserve"
+            };
+        }
+        else if (division == 2) {
+            names = {
+                "Adams State",
+                "Colorado School of Mines",
+                "Grand Valley State",
+                "Western Colorado",
+                "West Texas A&M",
+                "Wingate",
+                "Chico State",
+                "Colorado Christian",
+                "Lee",
+                "UCCS",
+                "CSU Pueblo",
+                "Cal Poly Pomona",
+                "Western Washington",
+                "Lewis",
+                "Augustana (SD)",
+                "Minnesota State",
+                "Michigan Tech",
+                "Saginaw Valley State",
+                "Missouri Southern",
+                "Pittsburg State",
+                "Northwest Missouri State",
+                "Harding",
+                "Alabama Huntsville",
+                "Tampa",
+                "Embry-Riddle (FL)",
+                "Anderson (SC)",
+                "Lenoir-Rhyne",
+                "Western Oregon",
+                "Alaska Anchorage",
+                "Northwest Nazarene",
+                "Westmont"
+            };
+        }
+        else {
+            names = {
+                "Oklahoma State",
+                "BYU",
+                "Northern Arizona",
+                "Stanford",
+                "Oregon",
+                "New Mexico",
+                "Arkansas",
+                "Wisconsin",
+                "Iowa State",
+                "Colorado",
+                "Notre Dame",
+                "North Carolina",
+                "Wake Forest",
+                "Alabama",
+                "Tennessee",
+                "Villanova",
+                "Georgetown",
+                "Washington",
+                "Gonzaga",
+                "Portland",
+                "Boise State",
+                "Michigan",
+                "Michigan State",
+                "Indiana",
+                "Princeton",
+                "Harvard",
+                "Syracuse",
+                "Virginia",
+                "NC State",
+                "Florida State",
+                "Tulsa"
+            };
+        }
     }
 
-    return 0;
+    vector<OpposingTeam> teams;
+
+    int fastestTime;
+
+    if (meetNumber >= 5) {
+        if (division == 1) fastestTime = 1840;
+        else if (division == 2) fastestTime = 1810;
+        else fastestTime = 1780;
+    }
+    else if (meetNumber == 4) {
+        if (division == 1) fastestTime = 1480;
+        else if (division == 2) fastestTime = 1450;
+        else fastestTime = 1420;
+    }
+    else if (meetNumber == 0) fastestTime = 1490;
+    else if (meetNumber == 1) fastestTime = 1425;
+    else if (meetNumber == 2) fastestTime = 1450;
+    else fastestTime = 1435;
+
+    for (int i = 0; i < static_cast<int>(names.size()); i++) {
+        OpposingTeam team;
+
+        team.name = names[i];
+        team.averageTime = fastestTime + i * 5;
+
+        teams.push_back(team);
+    }
+
+    return teams;
 }
 
+// ========================================================================
+// RACE RESULTS AND XC SCORING
+// ========================================================================
+void calculateXCResults(const int runnersTimes[], const Runner runners[],
+                        vector<OpposingTeam>& teams, int meetNumber) {
+
+    struct TeamResult {
+        string name;
+        int score;
+        int sixthPlace;
+        int seventhPlace;
+    };
+
+    vector<RaceFinisher> finishers;
+    vector<TeamResult> results;
+
+    random_device rd;
+    mt19937 gen(rd());
+
+    uniform_int_distribution<int> variation(-12, 12);
+
+    for (int i = 0; i < 7; i++) {
+        RaceFinisher finisher;
+
+        finisher.team = "Your Team";
+        finisher.runner = runners[i].name;
+        finisher.time = runnersTimes[i];
+        finisher.place = 0;
+
+        finishers.push_back(finisher);
+    }
+
+    int offsets[7] = {
+        -35, -20, -10, 0, 15, 30, 45
+    };
+
+    for (int i = 0; i < static_cast<int>(teams.size()); i++) {
+        for (int j = 0; j < 7; j++) {
+            RaceFinisher finisher;
+
+            finisher.team = teams[i].name;
+            finisher.runner = "Runner " + to_string(j + 1);
+
+            finisher.time = teams[i].averageTime
+                + offsets[j]
+                + courseTimeAdjustment[meetNumber]
+                + variation(gen);
+
+            finisher.place = 0;
+
+            finishers.push_back(finisher);
+        }
+    }
+
+    sort(finishers.begin(), finishers.end(),
+        [](const RaceFinisher& a, const RaceFinisher& b) {
+            return a.time < b.time;
+        });
+
+    for (int i = 0; i < static_cast<int>(finishers.size()); i++) {
+        finishers[i].place = i + 1;
+    }
+
+    vector<string> teamNames;
+    teamNames.push_back("Your Team");
+
+    for (int i = 0; i < static_cast<int>(teams.size()); i++) {
+        teamNames.push_back(teams[i].name);
+    }
+
+    for (int i = 0; i < static_cast<int>(teamNames.size()); i++) {
+        TeamResult result;
+
+        result.name = teamNames[i];
+        result.score = 0;
+        result.sixthPlace = 100000;
+        result.seventhPlace = 100000;
+
+        int runnersFound = 0;
+
+        for (int j = 0; j < static_cast<int>(finishers.size()); j++) {
+            if (finishers[j].team == teamNames[i]) {
+                runnersFound++;
+
+                if (runnersFound <= 5) {
+                    result.score += finishers[j].place;
+                }
+                else if (runnersFound == 6) {
+                    result.sixthPlace = finishers[j].place;
+                }
+                else if (runnersFound == 7) {
+                    result.seventhPlace = finishers[j].place;
+                }
+            }
+        }
+
+        results.push_back(result);
+    }
+
+    sort(results.begin(), results.end(),
+        [](const TeamResult& a, const TeamResult& b) {
+            if (a.score != b.score) {
+                return a.score < b.score;
+            }
+
+            if (a.sixthPlace != b.sixthPlace) {
+                return a.sixthPlace < b.sixthPlace;
+            }
+
+            return a.seventhPlace < b.seventhPlace;
+        });
+
+    cout << "\n============================\n";
+    cout << "INDIVIDUAL RACE RESULTS\n";
+    cout << "============================\n";
+
+    for (int i = 0; i < static_cast<int>(finishers.size()); i++) {
+        cout << setw(3) << finishers[i].place << ". "
+             << finishers[i].team << " - "
+             << finishers[i].runner << " - ";
+
+        printTime(finishers[i].time);
+        cout << "\n";
+    }
+
+    cout << "\n============================\n";
+    cout << "XC TEAM STANDINGS\n";
+    cout << "============================\n";
+
+    for (int i = 0; i < static_cast<int>(results.size()); i++) {
+        cout << setw(2) << i + 1 << ". "
+             << results[i].name
+             << " - " << results[i].score
+             << " points\n";
+    }
+
+    for (int i = 0; i < static_cast<int>(results.size()); i++) {
+        if (results[i].name == "Your Team") {
+            cout << "\nYOUR TEAM FINISHED "
+                 << i + 1 << " OF "
+                 << results.size() << " TEAMS\n";
+
+            cout << "Final XC Score: "
+                 << results[i].score << "\n";
+
+            break;
+        }
+    }
+}
+
+// ========================================================================
+// NATIONAL COMPARISON
+// ========================================================================
 void nationalComparison(const int runnersTimes[],
     int division, int meetNumber) {
 
@@ -715,60 +1067,3 @@ void nationalComparison(const int runnersTimes[],
         }
     }
 }
-
-void simulateOpponents(OpposingTeam teams[], int teamCount) {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int> variation(-15, 15);
-
-    for (int i = 0; i < teamCount; i++) {
-        teams[i].raceTime =
-            teams[i].averageTime + variation(gen);
-    }
-}
-
-int calculatePlacement(const int runnersTimes[],
-    const OpposingTeam teams[],
-    int teamCount) {
-
-    int times[7];
-
-    for (int i = 0; i < 7; i++) {
-        times[i] = runnersTimes[i];
-    }
-
-    sort(times, times + 7);
-
-    int total = 0;
-
-    for (int i = 0; i < 5; i++) {
-        total += times[i];
-    }
-
-    double teamAverage = total / 5.0;
-
-    int placement = 1;
-
-    for (int i = 0; i < teamCount; i++) {
-        if (teams[i].raceTime < teamAverage) {
-            placement++;
-        }
-    }
-    return placement;
-}
-
-void selectOpponents(int meetNumber, int division) {
-    if (meetNumber < 4) {
-
-    }
-    else if (meetNumber == 4) {
-
-    }
-    else if (meetNumber == 5) {
-
-    }
-    else if (meetNumber == 6) {
-
-    }
-}
-
