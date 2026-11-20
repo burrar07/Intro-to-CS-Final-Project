@@ -106,6 +106,13 @@ RunnerStats generateRunnerStats(int difficulty);
 void chooseWorkout(string& workout, int number);
 void applyWorkout(Runner& runner, string workout);
 void schedule(Runner runners[], int division);
+void seasonMenu(const Runner runners[], int division, int week);
+void showRunnerStats(const Runner runners[]);
+void showWorkoutInfo();
+void showSeasonSchedule(int currentWeek);
+void showNextRace(int currentWeek);
+void showNationalProjection(const Runner runners[], int division);
+void advanceWeekMenu(const Runner runners[], int division, int week);
 int calc8kTime(const RunnerStats& stats);
 int calc10kTime(const RunnerStats& stats);
 int calculateCourseEffect(const RunnerStats& stats, int meetNumber);
@@ -354,47 +361,153 @@ void applyWorkout(Runner& runner, string workout) {
 // ========================================================================
 // SEASON SCHEDULE
 // ========================================================================
-void schedule(Runner runner[], int division) {
+// Weeks in which the seven meets take place.
+const int meetWeeks[7] = {3, 5, 8, 9, 12, 14, 16};
+
+void showRunnerStats(const Runner runners[]) {
+    cout << "\n========== RUNNER STATS ==========\n";
+    for (int i = 0; i < 7; i++) {
+        cout << i + 1 << ". " << runners[i].name
+             << " | Endurance: " << runners[i].stats.endurance
+             << " | Speed: " << runners[i].stats.speed
+             << " | Fatigue: " << runners[i].stats.fatigue << "\n";
+    }
+}
+
+void showWorkoutInfo() {
+    cout << "\n========== WORKOUT GUIDE ==========\n";
+    cout << "1. Steady State: +2 endurance, +3 fatigue\n";
+    cout << "2. Mile Repeats: +2 speed, +4 fatigue\n";
+    cout << "3. The Eagle: +2 endurance, +2 speed, +9 fatigue\n";
+    cout << "4. Hill Repeats: +3 endurance, +7 fatigue\n";
+    cout << "5. 2k Repeats: +1 endurance, +2 speed, +6 fatigue\n";
+    cout << "6. Premeet: -7 fatigue\n";
+    cout << "7. Rest: -15 fatigue\n";
+    cout << "Stats are limited to the range 0-100.\n";
+    cout << "You choose two workouts each week for the entire team.\n";
+}
+
+void showSeasonSchedule(int currentWeek) {
+    cout << "\n========== FULL SEASON SCHEDULE ==========\n";
+    for (int i = 0; i < 7; i++) {
+        cout << "Week " << setw(2) << meetWeeks[i] << ": " << Schedule[i];
+        if (meetWeeks[i] < currentWeek) cout << " (completed)";
+        else if (meetWeeks[i] == currentWeek) cout << " (this week)";
+        cout << "\n";
+    }
+    cout << "All other weeks are training weeks.\n";
+}
+
+void showNextRace(int currentWeek) {
+    cout << "\n========== NEXT RACE ==========\n";
+    for (int i = 0; i < 7; i++) {
+        if (meetWeeks[i] >= currentWeek) {
+            int weeksAway = meetWeeks[i] - currentWeek;
+            cout << Schedule[i] << " (Week " << meetWeeks[i] << ")\n";
+            if (weeksAway == 0) cout << "Your race is THIS WEEK, after training!\n";
+            else cout << weeksAway << " week(s) until race week.\n";
+            return;
+        }
+    }
+    cout << "All races are finished.\n";
+}
+
+void showNationalProjection(const Runner runners[], int division) {
+    int projectedTimes[7];
+    cout << "\n========== NATIONAL PROJECTION ==========\n";
+    cout << "Based on current runner stats, assuming a neutral 8K course.\n";
+    cout << "No random race variation is included.\n";
+    for (int i = 0; i < 7; i++) {
+        projectedTimes[i] = calc8kTime(runners[i].stats);
+    }
+    // The comparison function uses 8K times when meetNumber is below 5.
+    nationalComparison(projectedTimes, division, 0);
+}
+
+void seasonMenu(const Runner runners[], int division, int week) {
+    int choice = 0;
+    while (choice != 5) {
+        cout << "\n========== WEEK " << week << " MENU ==========\n";
+        showNextRace(week);
+        cout << "1. View national projection\n";
+        cout << "2. View runner stats\n";
+        cout << "3. Workout information\n";
+        cout << "4. Full season schedule\n";
+        cout << "5. Continue to this week's training\n";
+        cout << "Enter your choice: ";
+
+        if (!(cin >> choice)) {
+            if (cin.eof()) return;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            choice = 0;
+        }
+
+        if (choice == 1) showNationalProjection(runners, division);
+        else if (choice == 2) showRunnerStats(runners);
+        else if (choice == 3) showWorkoutInfo();
+        else if (choice == 4) showSeasonSchedule(week);
+        else if (choice != 5) cout << "Invalid option. Please choose 1-5.\n";
+    }
+}
+
+// Review the team after workouts and racing before advancing.
+void advanceWeekMenu(const Runner runners[], int division, int week) {
+    while (true) {
+        cout << "\n========== END OF WEEK " << week << " ==========\n";
+        cout << "1. Review runner stats\n";
+        cout << "2. Review national projection\n";
+        cout << "3. Advance to next week\n";
+        cout << "Enter your choice: ";
+
+        int choice;
+        if (!(cin >> choice)) {
+            if (cin.eof()) return;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid option.\n";
+            continue;
+        }
+
+        if (choice == 1) showRunnerStats(runners);
+        else if (choice == 2) showNationalProjection(runners, division);
+        else if (choice == 3) return;
+        else cout << "Invalid option. Please choose 1-3.\n";
+    }
+}
+
+void schedule(Runner runners[], int division) {
     int meetCount = 0;
     string workoutChoice;
 
     for (int week = 1; week <= 16; week++) {
-        cout << "\nWelcome to week " << week;
-        cout << ". These are the current stats of the runners:\n";
+        seasonMenu(runners, division, week);
+        if (!cin) return;
 
-        for (int j = 0; j < 7; j++) {
-            cout << runner[j].name << ":\n";
-
-            cout << "Endurance: " << runner[j].stats.endurance
-                << ", Speed: " << runner[j].stats.speed
-                << ", Fatigue: " << runner[j].stats.fatigue
-                << "\n";
-        }
-
-        for (int a = 1; a <= 2; a++) {
-            chooseWorkout(workoutChoice, a);
-
-            for (int b = 0; b < 7; b++) {
-                applyWorkout(runner[b], workoutChoice);
+        for (int workoutNumber = 1; workoutNumber <= 2; workoutNumber++) {
+            chooseWorkout(workoutChoice, workoutNumber);
+            if (!cin) return;
+            for (int i = 0; i < 7; i++) {
+                applyWorkout(runners[i], workoutChoice);
             }
         }
 
-        if (week == 3 || week == 5 || week == 8 ||
-            week == 9 || week == 12 || week == 14 ||
-            week == 16) {
-
-            runMeet(runner, meetCount, division);
+        if (meetCount < 7 && week == meetWeeks[meetCount]) {
+            runMeet(runners, meetCount, division);
             meetCount++;
         }
 
-        for (int j = 0; j < 7; j++) {
-            runner[j].stats.fatigue -= 3;
+        for (int i = 0; i < 7; i++) {
+            runners[i].stats.fatigue = max(0, runners[i].stats.fatigue - 3);
+        }
 
-            if (runner[j].stats.fatigue < 0) {
-                runner[j].stats.fatigue = 0;
-            }
+        if (week < 16) {
+            advanceWeekMenu(runners, division, week);
+            if (!cin) return;
         }
     }
+
+    cout << "\nSeason complete! Thanks for playing.\n";
 }
 
 // ========================================================================
@@ -1067,3 +1180,4 @@ void nationalComparison(const int runnersTimes[],
         }
     }
 }
+
