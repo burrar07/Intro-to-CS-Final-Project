@@ -27,6 +27,16 @@ struct OpposingTeam {
     int teamScore;
 };
 
+const int opponentCounts[7] = {
+    9,   // Mark Covert
+    19,  // UCR
+    24,  // Lewis
+    19,  // Highlander
+    11,  // Conference
+    24,  // Regionals
+    31   // Nationals
+};
+
 OpposingTeam markCovertTeams[4] = {
     { "Cal State Fullerton", 1510, 0, 0 },
     { "UC Irvine", 1490, 0, 0 },
@@ -50,6 +60,7 @@ void simulateOpponents(OpposingTeam teams[], int teamCount);
 int calculatePlacement(const int runnersTimes[], const OpposingTeam teams[], int teamCount);
 void printTime(double seconds);
 int interpolateScore(int time, const int times[], const int scores[], int count);
+void selectOpponents(int meetNumber, int division);
 
 const int UCRTimes[25] = { 1437,1447,1447,1463,1445,1455,1456,1457,1465,1466,1465,1467,1471,1472,1476,1477,1483,1486,1494,1492,1500,1503,1513,1508,1524 };
 const int UCRScores[25] = { 49,97,103,159,178,235,247,251,298,313,315,320,350,366,389,395,440,483,492,497,539,568,579,597,710 };
@@ -74,6 +85,20 @@ const string Schedule[7] = {
     "Conference",
     "Regionals",
     "Nationals"
+};
+
+const int courseDifficulty[7] = {
+    2, 1, 3, 3, 4, 4, 5
+};
+
+const int courseTimeAdjustment[7] = {
+    10,   // Mark Covert
+    -10,  // UCR
+    30,   // Lewis Invitational
+    -10,  // Highlander Invitational
+    25,   // Conference
+    35,   // Regionals
+    45    // Nationals
 };
 
 const string D1NationalTeams[3] = {
@@ -243,6 +268,7 @@ void chooseWorkout(string& workout, int number) {
     else if (choice == 4) workout = "Hill Repeats";
     else if (choice == 5) workout = "2k Repeats";
     else if (choice == 6) workout = "Premeet";
+    else if (choice == 7) workout = "Rest";
     else workout = "Rest";
 
     cout << "\nSelected workout: " << workout << "\n";
@@ -410,6 +436,17 @@ void printTime(double seconds) {
         << setfill(' ');
 }
 
+int calculateCourseEffect(const RunnerStats& stats, int meetNumber) {
+    int adjustment = courseTimeAdjustment[meetNumber];
+
+    // Endurance helps runners handle difficult courses.
+    if (courseDifficulty[meetNumber] >= 3) {
+        adjustment -= (stats.endurance - 50) / 5;
+    }
+
+    return adjustment;
+}
+
 void runMeet(Runner runners[], int meetNumber, int division) {
     int runnersTimes[7];
     int runnersScores[7];
@@ -427,6 +464,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
             runnersTimes[i] = calc8kTime(runners[i].stats);
         }
 
+        runnersTimes[i] += calculateCourseEffect(runners[i].stats, meetNumber);
         runnersTimes[i] += raceVariation(gen);
 
         runners[i].stats.fatigue += 8;
@@ -448,6 +486,8 @@ void runMeet(Runner runners[], int meetNumber, int division) {
 
     cout << "\n============================\n";
     cout << Schedule[meetNumber] << " Results\n";
+    cout << "Course Difficulty: "
+         << courseDifficulty[meetNumber] << "/5\n";
     cout << "============================\n";
 
     for (int i = 0; i < 7; i++) {
@@ -716,3 +756,19 @@ int calculatePlacement(const int runnersTimes[],
     }
     return placement;
 }
+
+void selectOpponents(int meetNumber, int division) {
+    if (meetNumber < 4) {
+
+    }
+    else if (meetNumber == 4) {
+
+    }
+    else if (meetNumber == 5) {
+
+    }
+    else if (meetNumber == 6) {
+
+    }
+}
+
