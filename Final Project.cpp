@@ -34,7 +34,7 @@ struct RaceFinisher {
 };
 
 // ========================================================================
-// MEET AND NATIONAL REFERENCE DATA
+// MEET/NATIONAL REFERENCE DATA
 // ========================================================================
 const string Schedule[7] = {
     "Mark Covert",
