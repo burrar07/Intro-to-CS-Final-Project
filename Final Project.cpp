@@ -20,6 +20,11 @@ struct Runner {
     string name;
     RunnerStats stats;
     string workout;
+    int grades = 80;
+    int weeksOut = 0;
+    int racePenalty = 0;
+    int eventWeeks = 0;
+    string currentEvent = "Healthy";
 };
 
 struct OpposingTeam {
@@ -44,6 +49,272 @@ struct MeetHistory {
 };
 
 vector<MeetHistory> meetHistory;
+
+struct RandomEvent {
+    string name, category;
+    int racePenalty, fatigueChange, gradeChange, enduranceChange, speedChange;
+    int weeksOut, duration;
+};
+const vector<RandomEvent> eventDatabase = {
+    { "Shin splints", "Fatigue", 15, 5, 0, 0, 0, 0, 2 },
+    { "Rolled ankle", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Stress fracture", "Fatigue", 0, 5, 0, 0, 0, 6, 6 },
+    { "Pulled hamstring", "Fatigue", 0, 5, 0, 0, 0, 3, 3 },
+    { "Knee pain", "Fatigue", 20, 5, 0, 0, 0, 0, 2 },
+    { "Achilles soreness", "Fatigue", 15, 5, 0, 0, 0, 0, 2 },
+    { "Plantar fasciitis", "Fatigue", 20, 5, 0, 0, 0, 0, 3 },
+    { "Hip flexor strain", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Calf strain", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Back spasms", "Fatigue", 15, 5, 0, 0, 0, 0, 1 },
+    { "Blisters", "Fatigue", 5, 2, 0, 0, 0, 0, 1 },
+    { "Tight quads", "Fatigue", 0, 10, 0, 0, 0, 0, 1 },
+    { "IT band irritation", "Fatigue", 15, 5, 0, 0, 0, 0, 2 },
+    { "Pulled groin", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Bruised heel", "Fatigue", 10, 5, 0, 0, 0, 0, 1 },
+    { "Tripped on a trail", "Fatigue", 0, 10, 0, 0, 0, 0, 1 },
+    { "Fell during strides", "Fatigue", 10, 5, 0, 0, 0, 0, 1 },
+    { "Basketball ankle injury", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Concussion during intramurals", "Fatigue", 0, 0, 0, 0, 0, 3, 3 },
+    { "Injury from bad decisions", "Fatigue", 0, 5, 0, 0, 0, 2, 2 },
+    { "Common cold", "Sickness", 10, 5, 0, 0, 0, 0, 1 },
+    { "Flu", "Sickness", 0, 5, 0, 0, 0, 2, 2 },
+    { "Stomach bug", "Sickness", 0, 5, 0, 0, 0, 1, 1 },
+    { "Food poisoning", "Sickness", 0, 5, 0, 0, 0, 1, 1 },
+    { "Seasonal allergies", "Sickness", 10, 3, 0, 0, 0, 0, 2 },
+    { "Sinus infection", "Sickness", 15, 5, 0, 0, 0, 0, 2 },
+    { "Fever", "Sickness", 0, 5, 0, 0, 0, 1, 1 },
+    { "Bad cough", "Sickness", 15, 5, 0, 0, 0, 0, 1 },
+    { "Dehydrated after a hot day", "Sickness", 0, 10, 0, 0, 0, 0, 1 },
+    { "Poor sleep all week", "Sickness", 0, 15, 0, 0, 0, 0, 1 },
+    { "Stayed up studying", "Sickness", 0, 10, 0, 0, 0, 0, 1 },
+    { "Overtrained", "Sickness", 0, 10, 0, 0, 0, 2, 2 },
+    { "General exhaustion", "Sickness", 20, 10, 0, 0, 0, 0, 1 },
+    { "Questionable dining hall food", "Sickness", 10, 5, 0, 0, 0, 0, 1 },
+    { "Roommate brought home a bug", "Sickness", 15, 5, 0, 0, 0, 0, 1 },
+    { "Failed a midterm", "Academic", 0, 5, -15, 0, 0, 0, 1 },
+    { "Missed an assignment", "Academic", 0, 0, -10, 0, 0, 0, 1 },
+    { "Forgot a final exam", "Academic", 0, 10, -25, 0, 0, 0, 1 },
+    { "Academic probation warning", "Academic", 0, 5, -10, 0, 0, 0, 1 },
+    { "Academic eligibility review", "Academic", 0, 0, -15, 0, 0, 0, 1 },
+    { "Major project due", "Academic", 0, 10, 0, 0, 0, 0, 1 },
+    { "Three exams in one week", "Academic", 0, 15, 0, 0, 0, 0, 1 },
+    { "All-night study session", "Academic", 0, 10, 0, 0, 0, 0, 1 },
+    { "Surprise homework", "Academic", 0, 5, 0, 0, 0, 0, 1 },
+    { "Missed class for a race", "Academic", 0, 0, -5, 0, 0, 0, 1 },
+    { "Academic advisor meeting", "Academic", 0, 5, 5, 0, 0, 0, 1 },
+    { "Aced a major exam", "Academic", 0, 0, 10, 0, 0, 0, 1 },
+    { "Finished a project early", "Academic", 0, -10, 5, 0, 0, 0, 1 },
+    { "Got tutoring", "Academic", 0, 0, 10, 0, 0, 0, 1 },
+    { "Made the Deans List", "Academic", 0, -5, 15, 0, 0, 0, 1 },
+    { "Went through a breakup", "Social", 15, 5, 0, 0, 0, 0, 2 },
+    { "Started dating someone", "Social", 0, -5, 0, 0, 0, 0, 1 },
+    { "Relationship drama", "Social", 0, 10, 0, 0, 0, 0, 1 },
+    { "Argument with teammate", "Social", 10, 5, 0, 0, 0, 0, 1 },
+    { "Team group chat argument", "Social", 0, 5, 0, 0, 0, 0, 1 },
+    { "Roommate conflict", "Social", 0, 10, 0, 0, 0, 0, 1 },
+    { "Homesick", "Social", 10, 5, 0, 0, 0, 0, 1 },
+    { "Lost motivation", "Social", 15, 5, 0, 0, 0, 0, 2 },
+    { "Feeling overwhelmed", "Social", 0, 15, 0, 0, 0, 0, 1 },
+    { "Mental burnout", "Social", 0, 10, 0, 0, 0, 1, 1 },
+    { "Captain gives a great speech", "Social", 0, -5, 0, 0, 0, 0, 1 },
+    { "Team bonding night", "Social", 0, -10, 0, 0, 0, 0, 1 },
+    { "New friendship", "Social", 0, -5, 0, 0, 0, 0, 1 },
+    { "Teammates stop talking", "Social", 10, 5, 0, 0, 0, 0, 1 },
+    { "Runner regains confidence", "Social", -10, -5, 0, 0, 0, 0, 1 },
+    { "Locked out of dorm", "Luck", 0, 5, 0, 0, 0, 0, 1 },
+    { "All-night Minecraft session", "Luck", 0, 15, 0, 0, 0, 0, 1 },
+    { "Intramural basketball marathon", "Luck", 0, 10, 0, 0, 0, 0, 1 },
+    { "Tried to dunk and hurt ankle", "Luck", 0, 5, 0, 0, 0, 2, 2 },
+    { "Fell off a skateboard", "Luck", 0, 5, 0, 0, 0, 2, 2 },
+    { "Lost running shoes", "Luck", 0, 10, 0, 0, 0, 0, 1 },
+    { "Forgot spikes at meet", "Luck", 10, 0, 0, 0, 0, 0, 1 },
+    { "Accidentally ran too far", "Luck", 0, 20, 0, 0, 0, 0, 1 },
+    { "Risky pre-race meal", "Luck", 15, 0, 0, 0, 0, 0, 1 },
+    { "Entire pizza before practice", "Luck", 0, 10, 0, 0, 0, 0, 1 },
+    { "Slept through morning practice", "Luck", 0, 5, 0, -1, 0, 0, 1 },
+    { "Went to wrong race location", "Luck", 0, 0, 0, 0, 0, 1, 1 },
+    { "Got lost on long run", "Luck", 0, 15, 0, 0, 0, 0, 1 },
+    { "Prank war escalates", "Luck", 0, 5, 0, 0, 0, 0, 1 },
+    { "Tried racing a cyclist", "Luck", 0, 10, 0, 0, 0, 0, 1 },
+    { "Squirrel distraction", "Luck", 0, 5, 0, 0, 0, 0, 1 },
+    { "Joined intramural tournament", "Luck", 0, 15, 0, 0, 0, 0, 1 },
+    { "Tried to impress at gym", "Luck", 0, 20, 0, 0, 0, 0, 1 },
+    { "Late-night Strava argument", "Luck", 0, 10, 0, 0, 0, 0, 1 },
+    { "Unexplained nonsense", "Luck", 10, 5, 0, 0, 0, 0, 1 },
+    { "Huge training breakthrough", "Positive", 0, 0, 0, 3, 0, 0, 1 },
+    { "Perfect recovery week", "Positive", 0, -15, 0, 0, 0, 0, 1 },
+    { "Unexpected fitness jump", "Positive", 0, 0, 0, 0, 2, 0, 1 },
+    { "Great team chemistry", "Positive", 0, -5, 0, 0, 0, 0, 1 },
+    { "New motivation", "Positive", 0, 0, 0, 2, 0, 0, 1 },
+    { "Excellent sleep schedule", "Positive", 0, -10, 0, 0, 0, 0, 1 },
+    { "Great workout", "Positive", 0, 0, 0, 0, 2, 0, 1 },
+    { "Finally figures out pacing", "Positive", -10, 0, 0, 0, 0, 0, 1 },
+    { "Successful team retreat", "Positive", 0, -10, 0, 0, 0, 0, 1 },
+    { "Improved running form", "Positive", 0, 0, 0, 0, 2, 0, 1 },
+    { "Breakthrough long run", "Positive", 0, 0, 0, 3, 0, 0, 1 },
+    { "Unusually healthy week", "Positive", 0, -5, 0, 0, 0, 0, 1 },
+    { "Won a friendly competition", "Positive", 0, -5, 0, 0, 0, 0, 1 },
+    { "Motivational coach speech", "Positive", 0, -5, 0, 0, 0, 0, 1 },
+    { "Everything clicks", "Positive", -15, 0, 0, 0, 0, 0, 1 }
+};
+
+int capped(int value) { return clamp(value, 0, 100); }
+
+void beginWeek(Runner runners[]) {
+    for (int i = 0; i < 7; ++i) {
+        Runner& r = runners[i];
+        if (r.weeksOut > 0) --r.weeksOut;
+        if (r.eventWeeks > 0) {
+            --r.eventWeeks;
+            if (r.eventWeeks == 0) {
+                r.racePenalty = 0;
+                r.currentEvent = "Healthy";
+            }
+        }
+        r.grades = capped(r.grades + 2);
+    }
+}
+
+bool canRace(const Runner& r) {
+    return r.weeksOut == 0 && r.grades >= 60;
+}
+
+void applyRandomEvent(Runner& r, const RandomEvent& e) {
+    r.stats.fatigue = capped(r.stats.fatigue + e.fatigueChange);
+    r.stats.endurance = capped(r.stats.endurance + e.enduranceChange);
+    r.stats.speed = capped(r.stats.speed + e.speedChange);
+    r.grades = capped(r.grades + e.gradeChange);
+    r.weeksOut = max(r.weeksOut, e.weeksOut);
+    if (e.duration >= r.eventWeeks || e.weeksOut > 0) {
+        r.currentEvent = e.name;
+        r.racePenalty = max(-30, r.racePenalty + e.racePenalty);
+        r.eventWeeks = max(r.eventWeeks, e.duration);
+    }
+}
+
+void clearScreen();
+
+void eventScene(const Runner& runner, const RandomEvent& event, int week) {
+    clearScreen();
+    cout << "\n====================================================\n";
+    cout << "               WEEK " << week << " - TEAM NEWS\n";
+    cout << "====================================================\n\n";
+    cout << "EVENT: " << event.name << "\n\n";
+    if (event.category == "Fatigue")
+        cout << "The athletic trainer has an update about " << runner.name
+        << ". The training load has caught up with them.\n";
+    else if (event.category == "Sickness")
+        cout << runner.name << " hasn't been feeling right this week.\n"
+        << "The team will have to adjust its expectations.\n";
+    else if (event.category == "Academic")
+        cout << "An update from the classroom has arrived for " << runner.name
+        << ". School comes first, even during race season.\n";
+    else if (event.category == "Social")
+        cout << "There's been some news around the dorms involving "
+        << runner.name << ". Team life isn't always simple.\n";
+    else if (event.category == "Luck")
+        cout << "You weren't expecting this one. " << runner.name
+        << " has found a new way to make the season interesting.\n";
+    else
+        cout << "Some good news for " << runner.name
+        << "! Sometimes things just go your way.\n";
+
+    cout << "\nCOACH'S REPORT\n";
+    if (event.weeksOut > 0)
+        cout << "  Unavailable for at least " << event.weeksOut << " week(s).\n";
+    if (event.racePenalty != 0)
+        cout << "  Race time adjustment: " << (event.racePenalty > 0 ? "+" : "")
+        << event.racePenalty << " seconds.\n";
+    if (event.fatigueChange != 0)
+        cout << "  Fatigue: " << (event.fatigueChange > 0 ? "+" : "")
+        << event.fatigueChange << "\n";
+    if (event.gradeChange != 0)
+        cout << "  Grades: " << (event.gradeChange > 0 ? "+" : "")
+        << event.gradeChange << "\n";
+    if (event.enduranceChange != 0)
+        cout << "  Endurance: " << (event.enduranceChange > 0 ? "+" : "")
+        << event.enduranceChange << "\n";
+    if (event.speedChange != 0)
+        cout << "  Speed: " << (event.speedChange > 0 ? "+" : "")
+        << event.speedChange << "\n";
+    if (runner.grades < 60)
+        cout << "  ACADEMICALLY INELIGIBLE: cannot race until grades recover.\n";
+    cout << "\n----------------------------------------------------\n";
+    cout << "Enter 0 to continue to your team. ";
+    int choice = -1;
+    while (choice != 0) {
+        if (!(cin >> choice)) {
+            if (cin.eof()) return;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        if (choice != 0) cout << "Please enter 0: ";
+    }
+}
+
+void enforceFatigue(Runner runners[], int week) {
+    for (int i = 0; i < 7; ++i) {
+        Runner& r = runners[i];
+        if (r.stats.fatigue < 95 || r.weeksOut > 0) continue;
+        RandomEvent event = { "Extreme fatigue: mandatory recovery", "Fatigue",
+                             0, 0, 0, 0, 0, 1, 1 };
+        applyRandomEvent(r, event);
+        eventScene(r, event, week);
+    }
+}
+
+void generateRandomEvents(Runner runners[], int week) {
+    static mt19937 gen(random_device{}());
+    uniform_int_distribution<int> runnerPick(0, 6);
+    uniform_int_distribution<int> percent(1, 100);
+    cout << "\n========== WEEK " << week << " RANDOM EVENTS ==========\n";
+    int eventCount = uniform_int_distribution<int>(0, 2)(gen);
+    bool affected[7] = {};
+    int generated = 0;
+    for (int attempt = 0; attempt < 30 && generated < eventCount; ++attempt) {
+        int i = runnerPick(gen);
+        if (affected[i] || runners[i].weeksOut > 0) continue;
+        int fatigue = runners[i].stats.fatigue;
+        int risk = fatigue >= 85 ? 75 : fatigue >= 70 ? 45 :
+            fatigue >= 50 ? 20 : fatigue >= 30 ? 8 : 2;
+        string category;
+        int roll = percent(gen);
+        if (roll <= 20) category = "Positive";
+        else if (roll <= 40) category = "Academic";
+        else if (roll <= 60) category = "Social";
+        else if (roll <= 80) category = "Luck";
+        else category = (percent(gen) <= risk ? "Fatigue" : "Sickness");
+        vector<int> options;
+        for (int j = 0; j < (int)eventDatabase.size(); ++j)
+            if (eventDatabase[j].category == category) options.push_back(j);
+        if (options.empty()) continue;
+        const RandomEvent& e = eventDatabase[options[uniform_int_distribution<int>(0, (int)options.size() - 1)(gen)]];
+        applyRandomEvent(runners[i], e);
+        eventScene(runners[i], e, week);
+        affected[i] = true;
+        ++generated;
+        cout << runners[i].name << ": " << e.name;
+        if (e.weeksOut) cout << " | unavailable for " << e.weeksOut << " week(s)";
+        if (e.racePenalty) cout << " | race time change " << (e.racePenalty > 0 ? "+" : "") << e.racePenalty << "s";
+        cout << "\n";
+    }
+    enforceFatigue(runners, week);
+    if (!generated) cout << "No random incidents this week.\n";
+}
+
+void showAvailability(const Runner runners[]) {
+    cout << "\n========== TEAM AVAILABILITY ==========\n";
+    for (int i = 0; i < 7; ++i) {
+        const Runner& r = runners[i];
+        cout << r.name << " | " << (canRace(r) ? "READY" : "UNAVAILABLE")
+            << " | Grades " << r.grades << "/100"
+            << " | " << r.currentEvent;
+        if (r.weeksOut) cout << " | " << r.weeksOut << " week(s) out";
+        if (r.racePenalty && canRace(r)) cout << " | " << r.racePenalty << "s race adjustment";
+        cout << "\n";
+    }
+}
+
 
 void clearScreen() {
 #ifdef _WIN32
@@ -319,7 +590,7 @@ void chooseWorkout(string& workout, int number) {
     cout << "2. Mile Repeats\n";
     cout << "3. The Eagle\n";
     cout << "4. Hill Repeats\n";
-    cout << "5. 2k Repeats\n";
+    cout << "5. 1k Repeats\n";
     cout << "6. Premeet\n";
     cout << "7. Rest\n";
 
@@ -335,7 +606,7 @@ void chooseWorkout(string& workout, int number) {
     else if (choice == 2) workout = "Mile Repeats";
     else if (choice == 3) workout = "The Eagle";
     else if (choice == 4) workout = "Hill Repeats";
-    else if (choice == 5) workout = "2k Repeats";
+    else if (choice == 5) workout = "1k Repeats";
     else if (choice == 6) workout = "Premeet";
     else if (choice == 7) workout = "Rest";
     else workout = "Rest";
@@ -363,9 +634,8 @@ void applyWorkout(Runner& runner, string workout) {
         runner.stats.endurance += 3;
         runner.stats.fatigue += 7;
     }
-    else if (workout == "2k Repeats") {
-        runner.stats.endurance += 1;
-        runner.stats.speed += 2;
+    else if (workout == "1k Repeats") {
+        runner.stats.speed += 3;
         runner.stats.fatigue += 6;
     }
     else if (workout == "Premeet") {
@@ -392,7 +662,8 @@ void showRunnerStats(const Runner runners[]) {
         cout << i + 1 << ". " << runners[i].name
             << " | Endurance: " << runners[i].stats.endurance
             << " | Speed: " << runners[i].stats.speed
-            << " | Fatigue: " << runners[i].stats.fatigue << "\n";
+            << " | Fatigue: " << runners[i].stats.fatigue
+            << " | Grades: " << runners[i].grades << "\n";
     }
 }
 
@@ -402,11 +673,11 @@ void showWorkoutInfo() {
     cout << "2. Mile Repeats: +2 speed, +4 fatigue\n";
     cout << "3. The Eagle: +2 endurance, +2 speed, +9 fatigue\n";
     cout << "4. Hill Repeats: +3 endurance, +7 fatigue\n";
-    cout << "5. 2k Repeats: +1 endurance, +2 speed, +6 fatigue\n";
+    cout << "5. 1k Repeats: +3 speed, +6 fatigue\n";
     cout << "6. Premeet: -7 fatigue\n";
     cout << "7. Rest: -15 fatigue\n";
     cout << "Stats are limited to the range 0-100.\n";
-    cout << "You choose two workouts each week for the entire team.\n";
+    cout << "You choose two workouts each week for available runners.\n";
 }
 
 void showSeasonSchedule(int currentWeek) {
@@ -440,9 +711,11 @@ void showNationalProjection(const Runner runners[], int division) {
     cout << "Based on current runner stats, assuming a neutral 8K course.\n";
     cout << "No random race variation is included.\n";
     for (int i = 0; i < 7; i++) {
-        projectedTimes[i] = calc8kTime(runners[i].stats);
+        projectedTimes[i] = canRace(runners[i]) ? calc8kTime(runners[i].stats) : -1;
     }
-    nationalComparison(projectedTimes, division, 0);
+    int ready = count_if(projectedTimes, projectedTimes + 7, [](int t) { return t >= 0; });
+    if (ready >= 5) nationalComparison(projectedTimes, division, 0);
+    else cout << "Team projection: DNF (fewer than 5 eligible runners).\n";
 }
 
 void showMeetHistory() {
@@ -456,7 +729,8 @@ void showMeetHistory() {
         const MeetHistory& meet = meetHistory[i];
         cout << "\n" << i + 1 << ". " << meet.meetName
             << " (Week " << meet.week << ")\n";
-        cout << "   Team: " << meet.teamPlace << " of "
+        if (meet.teamScore == 0) cout << "   Team: DNF (fewer than 5 finishers)\n";
+        else cout << "   Team: " << meet.teamPlace << " of "
             << meet.standings.size() << " | "
             << meet.teamScore << " points\n";
         cout << "   Your runners:\n";
@@ -484,7 +758,7 @@ bool qualifiedForNationals() {
         }
 
         if (meetHistory[i].meetName == "Regionals") {
-            regionalPlace = meetHistory[i].teamPlace;
+            regionalPlace = meetHistory[i].teamScore == 0 ? 100 : meetHistory[i].teamPlace;
         }
     }
 
@@ -626,6 +900,8 @@ void schedule(Runner runners[], int division) {
     string workoutChoice;
 
     for (int week = 1; week <= 16; week++) {
+        beginWeek(runners);
+        generateRandomEvents(runners, week);
         if (!seasonMenu(runners, division, week)) {
             cout << "\nThanks for playing!\n";
             return;
@@ -635,15 +911,19 @@ void schedule(Runner runners[], int division) {
             chooseWorkout(workoutChoice, workoutNumber);
             if (!cin) return;
             for (int i = 0; i < 7; i++) {
-                applyWorkout(runners[i], workoutChoice);
+                if (canRace(runners[i])) applyWorkout(runners[i], workoutChoice);
             }
         }
 
 
+        enforceFatigue(runners, week);
+        showAvailability(runners);
         bool raceWeek = (meetCount < 7 && week == meetWeeks[meetCount]);
 
 
         if (raceWeek) {
+            cout << "\nEnter 0 to begin the race.\n";
+            returnToMenu();
             clearScreen();
             runMeet(runners, meetCount, division);
 
@@ -659,10 +939,10 @@ void schedule(Runner runners[], int division) {
                 else {
                     cout << "Your team did not qualify for Nationals.\n";
                     cout << "You needed top 3 at Regionals, or 4th "
-                         << "with a top 7 finish at Lewis.\n";
+                        << "with a top 7 finish at Lewis.\n";
 
                     cout << "\nFinal season results are available "
-                         << "in meet history.\n";
+                        << "in meet history.\n";
 
                     returnToMenu();
                     return;
@@ -674,7 +954,7 @@ void schedule(Runner runners[], int division) {
 
 
         for (int i = 0; i < 7; i++) {
-            runners[i].stats.fatigue = max(0, runners[i].stats.fatigue - 3);
+            runners[i].stats.fatigue = capped(runners[i].stats.fatigue - 3);
         }
 
         if (raceWeek) {
@@ -744,6 +1024,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
     uniform_int_distribution<int> raceVariation(-15, 15);
 
     for (int i = 0; i < 7; i++) {
+        if (!canRace(runners[i])) { runnersTimes[i] = -1; continue; }
         if (meetNumber >= 5) {
             runnersTimes[i] = calc10kTime(runners[i].stats);
         }
@@ -753,6 +1034,7 @@ void runMeet(Runner runners[], int meetNumber, int division) {
 
         runnersTimes[i] += calculateCourseEffect(runners[i].stats, meetNumber);
         runnersTimes[i] += raceVariation(gen);
+        runnersTimes[i] += runners[i].racePenalty;
 
         runners[i].stats.fatigue += 8;
 
@@ -771,7 +1053,8 @@ void runMeet(Runner runners[], int meetNumber, int division) {
 
     for (int i = 0; i < 7; i++) {
         cout << runners[i].name << ": ";
-        printTime(runnersTimes[i]);
+        if (runnersTimes[i] < 0) cout << "DID NOT START";
+        else printTime(runnersTimes[i]);
         cout << "\n";
     }
 
@@ -783,22 +1066,24 @@ void runMeet(Runner runners[], int meetNumber, int division) {
     }
 
     sort(sortedTimes, sortedTimes + 7);
+    int available = count_if(sortedTimes, sortedTimes + 7, [](int t) { return t >= 0; });
 
     int topFiveTotal = 0;
 
-    for (int i = 0; i < 5; i++) {
-        topFiveTotal += sortedTimes[i];
+    for (int i = 0; i < 5 && available >= 5; i++) {
+        topFiveTotal += sortedTimes[7 - available + i];
     }
 
     cout << "Top 5 Team Average: ";
-    printTime(topFiveTotal / 5.0);
+    if (available >= 5) printTime(topFiveTotal / 5.0);
+    else cout << "TEAM DNF (fewer than five runners)";
     cout << "\n";
 
     vector<OpposingTeam> teams = selectOpponents(meetNumber, division);
 
     calculateXCResults(runnersTimes, runners, teams, meetNumber);
 
-    nationalComparison(runnersTimes, division, meetNumber);
+    if (available >= 5) nationalComparison(runnersTimes, division, meetNumber);
 }
 
 vector<OpposingTeam> selectOpponents(int meetNumber, int division) {
@@ -1235,6 +1520,7 @@ void calculateXCResults(const int runnersTimes[], const Runner runners[],
     for (int i = 0; i < 7; i++) {
         RaceFinisher finisher;
 
+        if (runnersTimes[i] < 0) continue;
         finisher.team = "Your Team";
         finisher.runner = runners[i].name;
         finisher.time = runnersTimes[i];
@@ -1306,6 +1592,7 @@ void calculateXCResults(const int runnersTimes[], const Runner runners[],
             }
         }
 
+        if (result.name == "Your Team" && runnersFound < 5) result.score = 1000000;
         results.push_back(result);
     }
 
@@ -1336,8 +1623,8 @@ void calculateXCResults(const int runnersTimes[], const Runner runners[],
     for (int i = 0; i < static_cast<int>(results.size()); i++) {
         history.standings.push_back({ results[i].name, results[i].score });
         if (results[i].name == "Your Team") {
-            history.teamPlace = i + 1;
-            history.teamScore = results[i].score;
+            history.teamPlace = results[i].score == 1000000 ? (int)results.size() : i + 1;
+            history.teamScore = results[i].score == 1000000 ? 0 : results[i].score;
         }
     }
     meetHistory.push_back(history);
@@ -1362,18 +1649,22 @@ void calculateXCResults(const int runnersTimes[], const Runner runners[],
     for (int i = 0; i < static_cast<int>(results.size()); i++) {
         cout << setw(2) << i + 1 << ". "
             << results[i].name
-            << " - " << results[i].score
-            << " points\n";
+            << " - ";
+        if (results[i].score == 1000000) cout << "DNF\n";
+        else cout << results[i].score << " points\n";
     }
 
     for (int i = 0; i < static_cast<int>(results.size()); i++) {
         if (results[i].name == "Your Team") {
-            cout << "\nYOUR TEAM FINISHED "
-                << i + 1 << " OF "
+            if (results[i].score == 1000000)
+                cout << "\nYOUR TEAM: DNF - FEWER THAN FIVE FINISHERS\n";
+            else
+                cout << "\nYOUR TEAM FINISHED " << i + 1 << " OF "
                 << results.size() << " TEAMS\n";
 
-            cout << "Final XC Score: "
-                << results[i].score << "\n";
+            cout << "Final XC Score: ";
+            if (results[i].score == 1000000) cout << "DNF\n";
+            else cout << results[i].score << "\n";
 
             break;
         }
@@ -1401,11 +1692,16 @@ void nationalComparison(const int runnersTimes[],
     }
 
     sort(times, times + 7);
+    int available = count_if(times, times + 7, [](int t) { return t >= 0; });
+    if (available < 5) {
+        cout << "National comparison unavailable: team DNF.\n";
+        return;
+    }
 
     int total = 0;
 
     for (int i = 0; i < 5; i++) {
-        total += times[i];
+        total += times[7 - available + i];
     }
 
     double teamAverage = total / 5.0;
